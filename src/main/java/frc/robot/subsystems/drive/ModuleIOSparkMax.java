@@ -13,19 +13,23 @@
 
 package frc.robot.subsystems.drive;
 
+import java.util.OptionalDouble;
+import java.util.Queue;
+
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.RobotController;
-import java.util.OptionalDouble;
-import java.util.Queue;
 
 /**
  * Module IO implementation for SparkMax drive motor controller, SparkMax turn motor controller (NEO
@@ -40,9 +44,17 @@ import java.util.Queue;
  * "/Drive/ModuleX/TurnAbsolutePositionRad"
  */
 public class ModuleIOSparkMax implements ModuleIO {
+  //public static final double DRIVE_GEAR_RATIO = 1 / 7.13;
+  //public static final double WHEEL_DIAMITER_INCH = 3.9375; // was 4
+  //public static final double WHEEL_DIAMETER_METERS = 0.1000125;
+  // public static final double WHEEL_DIAMITER_INCH = 4; // was 4
+  // public static final double WHEEL_DIAMETER_METERS = WHEEL_DIAMITER_INCH / 39.37;
+  // public static final double DRIVE_ENCODER_ROT_TO_METER = DRIVE_GEAR_RATIO * Math.PI * WHEEL_DIAMETER_METERS;
+  // public static final double DRIVE_ENCODER_RPM_TO_METERS_PER_SECOND = DRIVE_ENCODER_ROT_TO_METER / 60; 
+
   // TODO: change this
-  private static final double DRIVE_GEAR_RATIO = 1 / 7.13;
-  private static final double TURN_GEAR_RATIO = 0;
+  private static final double DRIVE_GEAR_RATIO = (1 / 7.13);
+  private static final double TURN_GEAR_RATIO = 1;
 
   private final CANSparkMax driveSparkMax;
   private final CANSparkMax turnSparkMax;
@@ -54,33 +66,58 @@ public class ModuleIOSparkMax implements ModuleIO {
   private final Queue<Double> drivePositionQueue;
   private final Queue<Double> turnPositionQueue;
 
-  private final boolean isTurnMotorInverted = true;
+  private final boolean isTurnMotorInverted = false;
   private final Rotation2d absoluteEncoderOffset;
 
   public ModuleIOSparkMax(int index) {
+    CANcoderConfiguration config = new CANcoderConfiguration();
+    config.MagnetSensor = new MagnetSensorConfigs();
+    config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+    config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+
     switch (index) {
       case 0:
-        driveSparkMax = new CANSparkMax(1, MotorType.kBrushless);
-        turnSparkMax = new CANSparkMax(2, MotorType.kBrushless);
-        turnAbsoluteEncoder = new CANcoder(0);
+        turnSparkMax = new CANSparkMax(1, MotorType.kBrushless);
+        driveSparkMax = new CANSparkMax(2, MotorType.kBrushless);
+        turnAbsoluteEncoder = new CANcoder(1);
+
+        config.MagnetSensor.MagnetOffset = 0.396728515625;
+        turnAbsoluteEncoder.getConfigurator().apply(config);
+
+        driveSparkMax.setInverted(true);
+
         absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
         break;
       case 1:
-        driveSparkMax = new CANSparkMax(3, MotorType.kBrushless);
-        turnSparkMax = new CANSparkMax(4, MotorType.kBrushless);
-        turnAbsoluteEncoder = new CANcoder(1);
+        turnSparkMax = new CANSparkMax(3, MotorType.kBrushless);
+        driveSparkMax = new CANSparkMax(4, MotorType.kBrushless);
+        turnAbsoluteEncoder = new CANcoder(2);
+
+        config.MagnetSensor.MagnetOffset = -0.3564453125;
+        turnAbsoluteEncoder.getConfigurator().apply(config);
+
         absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
         break;
       case 2:
-        driveSparkMax = new CANSparkMax(5, MotorType.kBrushless);
-        turnSparkMax = new CANSparkMax(6, MotorType.kBrushless);
-        turnAbsoluteEncoder = new CANcoder(2);
+        turnSparkMax = new CANSparkMax(5, MotorType.kBrushless);
+        driveSparkMax = new CANSparkMax(6, MotorType.kBrushless);
+        turnAbsoluteEncoder = new CANcoder(3);
+
+        config.MagnetSensor.MagnetOffset = -0.46142578125;
+        turnAbsoluteEncoder.getConfigurator().apply(config);
+
+        driveSparkMax.setInverted(true);
+
         absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
         break;
       case 3:
-        driveSparkMax = new CANSparkMax(7, MotorType.kBrushless);
-        turnSparkMax = new CANSparkMax(8, MotorType.kBrushless);
-        turnAbsoluteEncoder = new CANcoder(3);
+        turnSparkMax = new CANSparkMax(7, MotorType.kBrushless);
+        driveSparkMax = new CANSparkMax(8, MotorType.kBrushless);
+        turnAbsoluteEncoder = new CANcoder(4);
+
+        config.MagnetSensor.MagnetOffset = 0.496826171875;
+        turnAbsoluteEncoder.getConfigurator().apply(config);
+
         absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
         break;
       default:

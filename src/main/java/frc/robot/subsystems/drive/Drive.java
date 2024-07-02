@@ -50,6 +50,7 @@ import frc.robot.RobotState;
 import frc.robot.subsystems.drive.Controllers.HeadingController;
 import frc.robot.subsystems.drive.Controllers.TeleopController;
 import frc.robot.util.LocalADStarAK;
+import frc.robot.util.Odometry.VSwerveDriveOdometry;
 
 public class Drive extends SubsystemBase {
   private static final double MAX_LINEAR_SPEED = Units.feetToMeters(14.5);
@@ -89,6 +90,9 @@ public class Drive extends SubsystemBase {
       };
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
+
+
+  private VSwerveDriveOdometry testodom = new VSwerveDriveOdometry(kinematics, getModuleTranslations(), getRotation(), lastModulePositions);
 
 
   public Drive(
@@ -206,6 +210,8 @@ public class Drive extends SubsystemBase {
     RobotState.get_instance().robotPose = poseEstimator.getEstimatedPosition();
     Logger.recordOutput("Odometry/CurrentPosition", poseEstimator.getEstimatedPosition());
 
+
+    Logger.recordOutput("TestOdom/CurrentPosition", testodom.updatePerWheel(lastModulePositions));
 
     //Note: the sceduler runs each subsystem's periodic method first. This is important so the heading controller does not get outdated data since it will be using the global state.
     //guess this does not matter anymore.

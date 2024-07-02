@@ -32,7 +32,7 @@ public class CarrierIOSparkMax implements CarrierIO {
         pdh.setSwitchableChannel(true);
 
         sensor = new DigitalInput(1);
-        motor = new CANSparkMax(0, MotorType.kBrushless);
+        motor = new CANSparkMax(12, MotorType.kBrushless);
         encoder = motor.getEncoder();
         feedback = motor.getPIDController();
     }

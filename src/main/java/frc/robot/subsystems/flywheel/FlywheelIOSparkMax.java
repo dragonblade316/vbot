@@ -28,8 +28,8 @@ import edu.wpi.first.math.util.Units;
 public class FlywheelIOSparkMax implements FlywheelIO {
   private static final double GEAR_RATIO = 1;
 
-  private final CANSparkMax leader = new CANSparkMax(0, MotorType.kBrushless);
-  private final CANSparkMax follower = new CANSparkMax(1, MotorType.kBrushless);
+  private final CANSparkMax leader = new CANSparkMax(10, MotorType.kBrushless);
+  private final CANSparkMax follower = new CANSparkMax(14, MotorType.kBrushless);
   private final RelativeEncoder encoder = leader.getEncoder();
   private final SparkPIDController pid = leader.getPIDController();
 
@@ -41,7 +41,7 @@ public class FlywheelIOSparkMax implements FlywheelIO {
     follower.setCANTimeout(250);
 
     leader.setInverted(false);
-    follower.follow(leader, false);
+    follower.follow(leader, true);
 
     leader.enableVoltageCompensation(12.0);
     leader.setSmartCurrentLimit(30);

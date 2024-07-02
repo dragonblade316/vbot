@@ -27,7 +27,7 @@ public class Carrier extends SubsystemBase {
         switch (Constants.currentMode) {
             case REAL:
                 feedforward = new SimpleMotorFeedforward(0, 0);
-                
+                io.setPID(1, 0, 0);
                 break;
             case REPLAY:
                 feedforward = new SimpleMotorFeedforward(0, 0);

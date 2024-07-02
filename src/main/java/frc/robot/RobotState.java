@@ -18,8 +18,8 @@ public class RobotState {
     public Pose2d robotPose = new Pose2d();
     public Twist2d translationVelocity = new Twist2d();
 
-    
-    
+    //climber
+    public boolean climbersUp = false;
 
     //intake and carrier:
     public boolean containsPiece = false;

@@ -29,16 +29,19 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.carrier.Carrier;
 import frc.robot.subsystems.carrier.CarrierIO;
 import frc.robot.subsystems.carrier.CarrierIOSim;
 import frc.robot.subsystems.carrier.CarrierIOSparkMax;
+import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
+import frc.robot.subsystems.extender.Extender;
 import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.flywheel.FlywheelIO;
 import frc.robot.subsystems.flywheel.FlywheelIOSim;
@@ -58,9 +61,11 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Flywheel flywheel;
-  private final Intake intake;
-  private final Carrier carrier;
-
+//   private final Intake intake;
+//   private final Carrier carrier;
+    // private final Arm arm;
+    // private final Climber climber;
+    // private final Extender extender;
 
   // Controller
   private final Joystick rjoy = new Joystick(0);
@@ -93,8 +98,8 @@ public class RobotContainer {
                 new ModuleIOSparkMax(2),
                 new ModuleIOSparkMax(3));
         flywheel = new Flywheel(new FlywheelIOSparkMax());
-        intake = new Intake(new IntakeIOSparkMax());
-        carrier = new Carrier(new CarrierIOSparkMax());
+        //intake = new Intake(new IntakeIOSparkMax());
+        //carrier = new Carrier(new CarrierIOSparkMax());
         break;
 
       case SIM:
@@ -107,8 +112,8 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim());
         flywheel = new Flywheel(new FlywheelIOSim());
-        intake = new Intake(new IntakeIOSim());
-        carrier = new Carrier(new CarrierIOSim());
+        // intake = new Intake(new IntakeIOSim());
+        // carrier = new Carrier(new CarrierIOSim());
         break;
 
       default:
@@ -121,8 +126,8 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         flywheel = new Flywheel(new FlywheelIO() {});
-        intake = new Intake(new IntakeIO() {});
-        carrier = new Carrier(new CarrierIO() {});
+        // intake = new Intake(new IntakeIO() {});
+        // carrier = new Carrier(new CarrierIO() {});
         break;
     }
 
@@ -158,22 +163,22 @@ public class RobotContainer {
         "Flywheel SysId (Dynamic Forward)", flywheel.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Flywheel SysId (Dynamic Reverse)", flywheel.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Intake SysId (Quasistatic forward)", intake.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Intake SysId (Quasistatic reverse)", intake.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Intake SysId (Dynamic Forward)", intake.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Intake SysId (Dynamic Reverse)", intake.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Carrier SysId (Quasistatic forward)", carrier.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Carrier SysId (Quasistatic reverse)", carrier.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Carrier SysId (Dynamic Forward)", carrier.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Carrier SysId (Dynamic Reverse)", carrier.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // autoChooser.addOption(
+    //     "Intake SysId (Quasistatic forward)", intake.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    // autoChooser.addOption(
+    //     "Intake SysId (Quasistatic reverse)", intake.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    // autoChooser.addOption(
+    //     "Intake SysId (Dynamic Forward)", intake.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // autoChooser.addOption(
+    //     "Intake SysId (Dynamic Reverse)", intake.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // autoChooser.addOption(
+    //     "Carrier SysId (Quasistatic forward)", carrier.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    // autoChooser.addOption(
+    //     "Carrier SysId (Quasistatic reverse)", carrier.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    // autoChooser.addOption(
+    //     "Carrier SysId (Dynamic Forward)", carrier.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // autoChooser.addOption(
+    //     "Carrier SysId (Dynamic Reverse)", carrier.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Configure the button bindings
     configureButtonBindings();
