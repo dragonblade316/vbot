@@ -2,23 +2,33 @@ package frc.robot.subsystems.climber;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class ClimberIOSparkMax implements ClimberIO{
-    private CANSparkMax moter;
+    private CANSparkMax motor;
     private RelativeEncoder encoder;
     private DigitalInput limitSwitch;
 
+    public ClimberIOSparkMax() {
+        motor = new CANSparkMax(0, MotorType.kBrushless);
+        encoder = motor.getEncoder();
+        limitSwitch = new DigitalInput(0);
+
+        encoder.setPositionConversionFactor(0);
+    }
+
     @Override
     public void updateInputs(ClimberIOInputs inputs) {
-        inputs.appliedVoltage = moter.getAppliedOutput();
+        inputs.appliedVoltage = motor.getAppliedOutput();
         inputs.atLowerLimit = limitSwitch.get();
-        inputs.encoder_value = encoder.getPosition();
+        inputs.heightFromBaseMeters = encoder.getPosition();
     }
 
     @Override
     public void setVoltage(double voltage) {
-        moter.setVoltage(voltage);
+        motor.setVoltage(voltage);
     }
 
     @Override

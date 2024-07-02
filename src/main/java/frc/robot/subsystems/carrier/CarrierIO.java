@@ -10,8 +10,10 @@ public interface CarrierIO {
         double velocity = 0.0;
         boolean isPiecePresent = false;
     }
-    public void updateInputs(CarrierIOInputs inputs);
+    public default void updateInputs(CarrierIOInputs inputs) {}
 
     public default void setVoltage(double voltage) {}
+    public default void setVelocity(double radiansPerSecond, double ffVoltage) {}
+    public default void setPID(double kp, double ki, double kd) {}
 
 }

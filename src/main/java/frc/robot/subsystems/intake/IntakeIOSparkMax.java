@@ -12,8 +12,18 @@ public class IntakeIOSparkMax implements IntakeIO {
         motor = new CANSparkMax(INTAKE_MOTOR_ID, CANSparkLowLevel.MotorType.kBrushless);
     }
 
+    public void updateInputs(IntakeIOInputs inputs) {
+        
+    }
+
+    public void setVelocity() {
+        
+    }
+
     @Override
     public void setVoltage(double voltage) {
         motor.setVoltage(voltage);
     }
+
+
 }

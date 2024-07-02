@@ -15,20 +15,22 @@ package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
+import org.ejml.simple.SimpleMatrix;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 
-import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -224,13 +226,64 @@ public class Drive extends SubsystemBase {
         //speeds = headingController.update(speeds, Rotation2d.fromRadians(gyroInputs.yawPosition.getRadians() + (speeds.omegaRadiansPerSecond / 50)));
         break;
       case Auto_Set_Heading:
-        //speeds = headingController.update(speeds, new Rotation2d());
+        //speeds = headingontroller.update(speeds, new Rotation2d());
         break;
     }
     Logger.recordOutput("Drive/Speeds", speeds);
 
+    skidDetection();
 
     runVelocity(speeds);
+  }
+
+  private void skidDetection() {
+    var states = getModuleStates();
+
+    var current = kinematics.toChassisSpeeds(getModuleStates());
+
+    int[] vels = new int[4];
+
+    var positions = getModulePositions();
+    SimpleMatrix[] wheelmatrixes = new SimpleMatrix[4];
+
+    for (int i = 0; i >= 3; i++) {
+      var x = states[i].speedMetersPerSecond * Math.cos(states[i].angle.getRadians());
+      var y = states[i].speedMetersPerSecond * Math.sin(states[i].angle.getRadians());
+
+      double[] warray = {x, y};
+      wheelmatrixes[i] = new SimpleMatrix(warray);
+
+      double[] darray = {getModuleTranslations()[i].getX(), getModuleTranslations()[i].getY()};
+      SimpleMatrix tMatrix = new SimpleMatrix(darray);
+      
+      double[] varray = {current.vxMetersPerSecond, current.vyMetersPerSecond};
+      SimpleMatrix cMatrix = new SimpleMatrix(varray);
+
+
+      
+
+    }
+    
+    
+
+
+    //get the fastest and slowest moduless
+    double highest = 0;
+    double lowest = 0;
+    for (SwerveModuleState i : states) {
+      if (i.speedMetersPerSecond > highest) highest = i.speedMetersPerSecond;
+      else if (i.speedMetersPerSecond < lowest) lowest = i.speedMetersPerSecond;
+    }
+    
+
+    try {
+      var stddev = Math.pow(highest/lowest, 8) / 10;
+      Logger.recordOutput("Drive/Temp/stateStddev", stddev);
+      //TODO: find a way to tell the pose estimator to not trust the odometry at this point based on the about stddev
+    } catch (ArithmeticException e) {
+      //I am ignoring divide by zeros here because at that point the robot is probably stopped.
+      //might fix this after some testing
+    }
   }
 
   public void updateTeleopInputs(double x, double y, double omega) {
@@ -245,6 +298,14 @@ public class Drive extends SubsystemBase {
     headingController = null;
   }
 
+  public void setAutoHeading(Supplier<Rotation2d> heading) {
+    PPHolonomicDriveController.setRotationTargetOverride(() -> Optional.of(heading.get()));
+  }
+
+  public void clearAutoHeading() {
+    PPHolonomicDriveController.setRotationTargetOverride(() -> Optional.empty());
+  }
+
   /**
    * Runs the drive at the desired velocity.:w
    
@@ -252,6 +313,11 @@ public class Drive extends SubsystemBase {
    * @param speeds Speeds in meters/sec
    */
   private void runVelocity(ChassisSpeeds speeds) {
+
+    //TODO: I might be able to reduce drift on the swerve. I also may just turn this into another controller.
+    //https://docs.google.com/presentation/d/1oh7BnamwzvyQyYRKtTKzhHc1T9l5YmhzTlriG2_he6M/edit#slide=id.g2df8babd0fa_5_157
+
+
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);

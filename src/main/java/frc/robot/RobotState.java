@@ -18,8 +18,8 @@ public class RobotState {
     public Pose2d robotPose = new Pose2d();
     public Twist2d translationVelocity = new Twist2d();
 
-    //will only ever be used with the heading controller
-    public boolean aligned = false;
+    
+    
 
     //intake and carrier:
     public boolean containsPiece = false;
@@ -34,5 +34,7 @@ public class RobotState {
         INACTIVE
     }
 
-    public FlywheelState shooterState = FlywheelState.INACTIVE;
+    public FlywheelState shooterFlywheelState = FlywheelState.INACTIVE;
+    public boolean headingAligned = false;
+    public boolean armInPosition = false;
 }

@@ -9,6 +9,7 @@ public interface ArmIO {
     public static class ArmIOInputs {
         public Rotation2d angle = Rotation2d.fromDegrees(0);
         public double appliedVolts = 0.0;
+        public double velocityRadPerSec = 0;
     }
 
     public void updateInputs(ArmIOInputs inputs);

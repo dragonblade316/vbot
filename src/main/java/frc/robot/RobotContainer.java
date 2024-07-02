@@ -13,19 +13,26 @@
 
 package frc.robot;
 
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.geometry.Pose2d;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.subsystems.carrier.Carrier;
+import frc.robot.subsystems.carrier.CarrierIO;
+import frc.robot.subsystems.carrier.CarrierIOSim;
+import frc.robot.subsystems.carrier.CarrierIOSparkMax;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -36,8 +43,10 @@ import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.flywheel.FlywheelIO;
 import frc.robot.subsystems.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.flywheel.FlywheelIOSparkMax;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.intake.IntakeIOSparkMax;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -49,15 +58,25 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Flywheel flywheel;
+  private final Intake intake;
+  private final Carrier carrier;
+
 
   // Controller
   private final Joystick rjoy = new Joystick(0);
   private final Joystick ljoy = new Joystick(1);
+  private final Joystick buttonPanel = new Joystick(2);
 
   JoystickButton button = new JoystickButton(rjoy, 1);
 
+  JoystickButton intakeButton;
+  JoystickButton fireButton;
+  JoystickButton autoaimButton;
+
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
+  private final LoggedDashboardChooser<Driver> driverChooser;
+
   private final LoggedDashboardNumber flywheelSpeedInput =
       new LoggedDashboardNumber("Flywheel Speed", 1500.0);
 
@@ -74,6 +93,8 @@ public class RobotContainer {
                 new ModuleIOSparkMax(2),
                 new ModuleIOSparkMax(3));
         flywheel = new Flywheel(new FlywheelIOSparkMax());
+        intake = new Intake(new IntakeIOSparkMax());
+        carrier = new Carrier(new CarrierIOSparkMax());
         break;
 
       case SIM:
@@ -86,6 +107,8 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim());
         flywheel = new Flywheel(new FlywheelIOSim());
+        intake = new Intake(new IntakeIOSim());
+        carrier = new Carrier(new CarrierIOSim());
         break;
 
       default:
@@ -98,8 +121,13 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         flywheel = new Flywheel(new FlywheelIO() {});
+        intake = new Intake(new IntakeIO() {});
+        carrier = new Carrier(new CarrierIO() {});
         break;
     }
+
+    driverChooser = new LoggedDashboardChooser<>("Driver");
+    driverChooser.addDefaultOption("Default", Driver.DEFAULT);
 
     // Set up auto routines
     NamedCommands.registerCommand(
@@ -130,6 +158,22 @@ public class RobotContainer {
         "Flywheel SysId (Dynamic Forward)", flywheel.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Flywheel SysId (Dynamic Reverse)", flywheel.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Intake SysId (Quasistatic forward)", intake.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Intake SysId (Quasistatic reverse)", intake.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Intake SysId (Dynamic Forward)", intake.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Intake SysId (Dynamic Reverse)", intake.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Carrier SysId (Quasistatic forward)", carrier.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Carrier SysId (Quasistatic reverse)", carrier.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Carrier SysId (Dynamic Forward)", carrier.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Carrier SysId (Dynamic Reverse)", carrier.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -142,6 +186,10 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+
+    //set per driver bindings here later
+    defaultDriverBindings();
+
     drive.setDefaultCommand(
         new RunCommand(
             () -> drive.updateTeleopInputs(rjoy.getY(), rjoy.getX(), -ljoy.getX()), 
@@ -153,6 +201,39 @@ public class RobotContainer {
     //this may be useful later but idk
 //    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
   }
+
+  private enum Driver {
+    DEFAULT,
+    SIM,
+  }
+
+  public void perDriveBinder() {
+    CommandScheduler.getInstance().getActiveButtonLoop().clear();
+
+    switch (driverChooser.get()) {
+        case DEFAULT:
+            defaultDriverBindings();
+            break;
+
+        case SIM:
+            simDriverBindings();
+            break;
+    
+        default:
+            defaultDriverBindings();
+            break;
+    }
+  }
+
+
+  private void defaultDriverBindings() {
+
+  }
+
+  private void simDriverBindings() {
+
+  }
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
