@@ -59,9 +59,9 @@ import frc.robot.subsystems.intake.IntakeIOSparkMax;
  */
 public class RobotContainer {
   // Subsystems
-  private final Drive drive;
+  //private final Drive drive;
   private final Flywheel flywheel;
-//   private final Intake intake;
+  private final Intake intake;
 //   private final Carrier carrier;
     // private final Arm arm;
     // private final Climber climber;
@@ -90,43 +90,43 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOPigeon2(false),
-                new ModuleIOSparkMax(0),
-                new ModuleIOSparkMax(1),
-                new ModuleIOSparkMax(2),
-                new ModuleIOSparkMax(3));
+        // drive =
+        //     new Drive(
+        //         new GyroIOPigeon2(false),
+        //         new ModuleIOSparkMax(0),
+        //         new ModuleIOSparkMax(1),
+        //         new ModuleIOSparkMax(2),
+        //         new ModuleIOSparkMax(3));
         flywheel = new Flywheel(new FlywheelIOSparkMax());
-        //intake = new Intake(new IntakeIOSparkMax());
+        intake = new Intake(new IntakeIOSparkMax());
         //carrier = new Carrier(new CarrierIOSparkMax());
         break;
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim());
+        // drive =
+        //     new Drive(
+        //         new GyroIO() {},
+        //         new ModuleIOSim(),
+        //         new ModuleIOSim(),
+        //         new ModuleIOSim(),
+        //         new ModuleIOSim());
         flywheel = new Flywheel(new FlywheelIOSim());
-        // intake = new Intake(new IntakeIOSim());
+        intake = new Intake(new IntakeIOSim());
         // carrier = new Carrier(new CarrierIOSim());
         break;
 
       default:
         // Replayed robot, disable IOdawd implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {});
+        // drive =
+        //     new Drive(
+        //         new GyroIO() {},
+        //         new ModuleIO() {},
+        //         new ModuleIO() {},
+        //         new ModuleIO() {},
+        //         new ModuleIO() {});
         flywheel = new Flywheel(new FlywheelIO() {});
-        // intake = new Intake(new IntakeIO() {});
+        intake = new Intake(new IntakeIO() {});
         // carrier = new Carrier(new CarrierIO() {});
         break;
     }
@@ -135,24 +135,25 @@ public class RobotContainer {
     driverChooser.addDefaultOption("Default", Driver.DEFAULT);
 
     // Set up auto routines
-    NamedCommands.registerCommand(
-        "Run Flywheel",
-        Commands.startEnd(
-                () -> flywheel.runVelocity(flywheelSpeedInput.get()), flywheel::stop, flywheel)
-            .withTimeout(5.0));
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    // NamedCommands.registerCommand(
+    //     "Run Flywheel",
+    //     Commands.startEnd(
+    //             () -> flywheel.runVelocity(flywheelSpeedInput.get()), flywheel::stop, flywheel)
+    //         .withTimeout(5.0));
+    //autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices");
 
     // Set up SysId routines
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Forward)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Reverse)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // autoChooser.addOption(
+    //     "Drive SysId (Quasistatic Forward)",
+    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    // autoChooser.addOption(
+    //     "Drive SysId (Quasistatic Reverse)",
+    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    // autoChooser.addOption(
+    //     "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // autoChooser.addOption(
+    //     "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     autoChooser.addOption(
         "Flywheel SysId (Quasistatic Forward)",
         flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
@@ -163,14 +164,14 @@ public class RobotContainer {
         "Flywheel SysId (Dynamic Forward)", flywheel.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Flywheel SysId (Dynamic Reverse)", flywheel.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    // autoChooser.addOption(
-    //     "Intake SysId (Quasistatic forward)", intake.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    // autoChooser.addOption(
-    //     "Intake SysId (Quasistatic reverse)", intake.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    // autoChooser.addOption(
-    //     "Intake SysId (Dynamic Forward)", intake.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    // autoChooser.addOption(
-    //     "Intake SysId (Dynamic Reverse)", intake.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Intake SysId (Quasistatic forward)", intake.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Intake SysId (Quasistatic reverse)", intake.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Intake SysId (Dynamic Forward)", intake.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Intake SysId (Dynamic Reverse)", intake.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     // autoChooser.addOption(
     //     "Carrier SysId (Quasistatic forward)", carrier.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     // autoChooser.addOption(
@@ -194,15 +195,19 @@ public class RobotContainer {
 
     //set per driver bindings here later
     defaultDriverBindings();
+    
+    
+    button.whileTrue(Commands.startEnd(() -> intake.IntakeIn(), () -> intake.stop(), intake));
+    //button.whileTrue(Commands.startEnd(() -> flywheel.runVelocity(10), () -> flywheel.runVelocity(10), flywheel));
 
-    drive.setDefaultCommand(
-        new RunCommand(
-            () -> drive.updateTeleopInputs(rjoy.getY(), rjoy.getX(), -ljoy.getX()), 
-            drive
-        )
-    );
+    // drive.setDefaultCommand(
+    //     new RunCommand(
+    //         () -> drive.updateTeleopInputs(rjoy.getY(), rjoy.getX(), -ljoy.getX()), 
+    //         drive
+    //     )
+    // );
 
-    button.whileTrue(Commands.startEnd(() -> drive.setHeading(() -> Rotation2d.fromDegrees(90)), () -> drive.clearHeading()));
+    //button.whileTrue(Commands.startEnd(() -> drive.setHeading(() -> Rotation2d.fromDegrees(90)), () -> drive.clearHeading()));
     //this may be useful later but idk
 //    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
   }

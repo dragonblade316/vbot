@@ -12,26 +12,34 @@ import edu.wpi.first.math.util.Units;
 public class IntakeIOSparkMax implements IntakeIO {
     public static final int INTAKE_MOTOR_ID = 11;
 
+    //I thought it should be 1/5 but that kept producing 0 for some reason so now we have this
+    public static final double GEAR_RATIO = 5;
+
     private CANSparkMax motor;
     private RelativeEncoder encoder;
     private SparkPIDController pid;
 
+
     public IntakeIOSparkMax() {
         motor = new CANSparkMax(INTAKE_MOTOR_ID, CANSparkLowLevel.MotorType.kBrushless);
+        encoder = motor.getEncoder();
+        pid = motor.getPIDController();
 
         //TODO: figure this out
-        encoder.setVelocityConversionFactor(1/5);
+        // encoder.setVelocityConversionFactor(1/5);
+        // encoder.setPositionConversionFactor(1/5);
     }
 
     public void updateInputs(IntakeIOInputs inputs) {
-        inputs.appliedVolts = motor.getAppliedOutput();
-        inputs.velocity = Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity());
+        inputs.appliedVolts = motor.getAppliedOutput() * motor.getBusVoltage();
+        inputs.velocityRPM = encoder.getVelocity() / GEAR_RATIO;
+        inputs.positionRotations = encoder.getPosition() / GEAR_RATIO;
     }
 
     @Override
-    public void setVelocity(double radiansPerSecond, double ffVoltage) {
+    public void setVelocity(double RPM, double ffVoltage) {
         pid.setReference(
-        Units.radiansPerSecondToRotationsPerMinute(radiansPerSecond),
+        RPM * GEAR_RATIO,
         ControlType.kVelocity,
         0,
         ffVoltage,

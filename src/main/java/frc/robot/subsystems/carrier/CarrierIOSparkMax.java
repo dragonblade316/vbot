@@ -2,6 +2,9 @@ package frc.robot.subsystems.carrier;
 
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+
+import java.util.InputMismatchException;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
@@ -40,7 +43,8 @@ public class CarrierIOSparkMax implements CarrierIO {
     public void updateInputs(CarrierIOInputs input) {
         input.isPiecePresent = sensor.get();
         input.appliedVolts = motor.getAppliedOutput();
-        input.velocity = encoder.getVelocity();
+        input.velocityRPM = encoder.getVelocity();
+        input.positionRotations = encoder.getPosition();
     }
 
     public void setVoltage(double voltage) {
@@ -48,10 +52,10 @@ public class CarrierIOSparkMax implements CarrierIO {
     }
 
     @Override
-    public void setVelocity(double radiansPerSecond, double ffVoltage) {
+    public void setVelocity(double rpm, double ffVoltage) {
         feedback.setReference(
         //idk the ratio right now
-        Units.radiansPerSecondToRotationsPerMinute(radiansPerSecond) /* * GEAR_RATIO*/,
+        rpm /* * GEAR_RATIO*/,
         ControlType.kVelocity,
         0,
         ffVoltage,

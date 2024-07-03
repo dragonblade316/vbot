@@ -26,7 +26,7 @@ public class CarrierIOSim implements CarrierIO {
     public void updateInputs(CarrierIOInputs inputs) {
         inputs.isPiecePresent = false; //sensorSim.getBoolean("isPiecePresent").get();
         inputs.appliedVolts = voltage;
-        inputs.velocity = motor.getAngularVelocityRadPerSec();
+        inputs.velocityRPM = motor.getAngularVelocityRPM();
 
         if (closedLoop) {
             voltage = MathUtil.clamp(feedback.calculate(motor.getAngularVelocityRadPerSec()) + ffVoltage, -12.0, 12.0);
@@ -35,7 +35,7 @@ public class CarrierIOSim implements CarrierIO {
     }
 
     @Override
-    public void setVelocity(double radiansPerSecond, double ffVoltage) {
+    public void setVelocity(double rpm, double ffVoltage) {
         closedLoop = true;
         this.ffVoltage = ffVoltage;
         feedback.setSetpoint(ffVoltage);

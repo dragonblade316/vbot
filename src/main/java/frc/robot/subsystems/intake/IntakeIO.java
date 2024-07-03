@@ -8,7 +8,8 @@ public interface IntakeIO {
         public double appliedVolts;
 
         //putting this here in case I decide to try out closed loop control for the intake
-        public double velocity;
+        public double velocityRPM;
+        public double positionRotations;
     }
 
     public default void updateInputs(IntakeIOInputs inputs) {};

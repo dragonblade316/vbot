@@ -7,7 +7,8 @@ public interface CarrierIO {
     @AutoLog
     public static class CarrierIOInputs {
         double appliedVolts = 0.0;
-        double velocity = 0.0;
+        double velocityRPM = 0.0;
+        double positionRotations = 0.0;
         boolean isPiecePresent = false;
     }
     public default void updateInputs(CarrierIOInputs inputs) {}

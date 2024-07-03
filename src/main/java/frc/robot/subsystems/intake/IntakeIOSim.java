@@ -22,10 +22,10 @@ public class IntakeIOSim implements IntakeIO {
 
     public void updateInputs(IntakeIOInputs inputs) {
         inputs.appliedVolts = motor.getOutput(0);
-        inputs.velocity = motor.getAngularVelocityRadPerSec();
+        inputs.velocityRPM = motor.getAngularVelocityRPM();
 
         if (closedLoop) {
-            voltage = MathUtil.clamp(feedback.calculate(motor.getAngularVelocityRadPerSec()) + ffVoltage, -12.0, 12.0);
+            voltage = MathUtil.clamp(feedback.calculate(motor.getAngularVelocityRPM()) + ffVoltage, -12.0, 12.0);
             motor.setInputVoltage(voltage);
         }
     }
@@ -37,10 +37,10 @@ public class IntakeIOSim implements IntakeIO {
         feedback.setD(kd);
     }
 
-    public void setVelocity(double radiansPerSecond, double ffVoltage) {
+    public void setVelocity(double rpm, double ffVoltage) {
         closedLoop = true;
         this.ffVoltage = ffVoltage;
-        feedback.setSetpoint(radiansPerSecond);
+        feedback.setSetpoint(rpm);
     }
 
     @Override

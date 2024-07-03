@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Volts;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -27,7 +28,9 @@ public class Intake extends SubsystemBase {
     public Intake(IntakeIO io) {
         switch (Constants.currentMode) {
             case REAL:
-                feedforward = new SimpleMotorFeedforward(0, 0);
+                feedforward = new SimpleMotorFeedforward(0.21726, 0.62516);
+                io.setPID(0.39639, 0.00, 0);
+                
                 break;
             case REPLAY:
                 feedforward = new SimpleMotorFeedforward(0, 0);
@@ -70,12 +73,12 @@ public class Intake extends SubsystemBase {
     }
 
     public void IntakeIn() {
-        setpointRPM = 100;
+        setpointRPM = 600;
         io.setVelocity(setpointRPM, feedforward.calculate(setpointRPM));
     }
 
     public void IntakeOut() {
-        setpointRPM = -100;
+        setpointRPM = -300;
         io.setVelocity(setpointRPM, feedforward.calculate(setpointRPM));
     }
 
@@ -87,6 +90,9 @@ public class Intake extends SubsystemBase {
     @Override
     public void periodic() {
         io.updateInputs(inputs);
+        Logger.processInputs("Intake", inputs);
+
+        Logger.recordOutput("Intake/SetPointRPM", setpointRPM);
     }
 }
 
