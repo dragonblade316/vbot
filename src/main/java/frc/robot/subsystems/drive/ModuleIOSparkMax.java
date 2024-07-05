@@ -64,6 +64,7 @@ public class ModuleIOSparkMax implements ModuleIO {
   private final CANcoder turnAbsoluteEncoder;
   private final Queue<Double> timestampQueue;
   private final Queue<Double> drivePositionQueue;
+  private final Queue<Double> driveVelocityQueue;
   private final Queue<Double> turnPositionQueue;
 
   private final boolean isTurnMotorInverted = false;
@@ -161,6 +162,7 @@ public class ModuleIOSparkMax implements ModuleIO {
         SparkMaxOdometryThread.getInstance()
             .registerSignal(
                 () -> {
+                  System.out.println("getting pos");
                   double value = driveEncoder.getPosition();
                   if (driveSparkMax.getLastError() == REVLibError.kOk) {
                     return OptionalDouble.of(value);
@@ -168,17 +170,31 @@ public class ModuleIOSparkMax implements ModuleIO {
                     return OptionalDouble.empty();
                   }
                 });
+    driveVelocityQueue = 
+        SparkMaxOdometryThread.getInstance()
+            .registerSignal(
+              () -> {
+                System.out.println("getting vel");
+                double value = driveEncoder.getVelocity();
+                if (driveSparkMax.getLastError() == REVLibError.kOk) {
+                  return OptionalDouble.of(value);
+                } else {
+                  return OptionalDouble.empty();
+                }
+              });
     turnPositionQueue =
         SparkMaxOdometryThread.getInstance()
             .registerSignal(
                 () -> {
-                  double value = turnRelativeEncoder.getPosition();
+                  //I know this is not the proper way to do thing but idk the proper way so this will work.(hopefully I will not accidently destroy the can bus utilization (but then again this project was going to do that anyway))
+                  double value = turnAbsoluteEncoder.getAbsolutePosition().getValue();
                   if (turnSparkMax.getLastError() == REVLibError.kOk) {
                     return OptionalDouble.of(value);
                   } else {
                     return OptionalDouble.empty();
                   }
                 });
+    
 
     driveSparkMax.burnFlash();
     turnSparkMax.burnFlash();
@@ -211,12 +227,17 @@ public class ModuleIOSparkMax implements ModuleIO {
         drivePositionQueue.stream()
             .mapToDouble((Double value) -> Units.rotationsToRadians(value) / DRIVE_GEAR_RATIO)
             .toArray();
+    inputs.odometryDriveVelocitiesRadPerSecond = 
+        driveVelocityQueue.stream()
+            .mapToDouble((Double value) -> Units.rotationsPerMinuteToRadiansPerSecond(value) / DRIVE_GEAR_RATIO)
+            .toArray();
     inputs.odometryTurnPositions =
         turnPositionQueue.stream()
             .map((Double value) -> Rotation2d.fromRotations(value / TURN_GEAR_RATIO))
             .toArray(Rotation2d[]::new);
     timestampQueue.clear();
     drivePositionQueue.clear();
+    driveVelocityQueue.clear();
     turnPositionQueue.clear();
   }
 

@@ -1,7 +1,11 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.util.Odometry.VSwervePoseEstimator;
 
 public class RobotState {
     private static RobotState instance;
@@ -13,6 +17,18 @@ public class RobotState {
         }
         return instance;
     }
+
+    public VSwervePoseEstimator poseEstimator = new VSwervePoseEstimator(
+        DriveConstants.kinematics, 
+        new Rotation2d(), 
+        new SwerveModulePosition[] {
+            new SwerveModulePosition(),
+            new SwerveModulePosition(),
+            new SwerveModulePosition(),
+            new SwerveModulePosition(),
+        }, 
+        new Pose2d()
+    );
 
     //drive base
     public Pose2d robotPose = new Pose2d();

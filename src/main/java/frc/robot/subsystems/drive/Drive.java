@@ -53,12 +53,7 @@ import frc.robot.util.LocalADStarAK;
 import frc.robot.util.Odometry.VSwervePoseEstimator;
 
 public class Drive extends SubsystemBase {
-  private static final double MAX_LINEAR_SPEED = Units.feetToMeters(14.5);
-  private static final double TRACK_WIDTH_X = Units.inchesToMeters(25.0);
-  private static final double TRACK_WIDTH_Y = Units.inchesToMeters(25.0);
-  private static final double DRIVE_BASE_RADIUS =
-      Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
-  private static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
+  
 
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
@@ -79,7 +74,7 @@ public class Drive extends SubsystemBase {
   private HeadingController headingController = null;
 
 
-  private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
+  private SwerveDriveKinematics kinematics = DriveConstants.kinematics;
   private Rotation2d rawGyroRotation = new Rotation2d();
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
       new SwerveModulePosition[] {
@@ -115,7 +110,7 @@ public class Drive extends SubsystemBase {
         () -> kinematics.toChassisSpeeds(getModuleStates()),
         this::runVelocity,
         new HolonomicPathFollowerConfig(
-            MAX_LINEAR_SPEED, DRIVE_BASE_RADIUS, new ReplanningConfig()),
+            DriveConstants.MAX_LINEAR_SPEED, DriveConstants.DRIVE_BASE_RADIUS, new ReplanningConfig()),
         () ->
             DriverStation.getAlliance().isPresent()
                 && DriverStation.getAlliance().get() == Alliance.Red,
@@ -177,6 +172,7 @@ public class Drive extends SubsystemBase {
     double[] sampleTimestamps =
         modules[0].getOdometryTimestamps(); // All signals are sampled together
     int sampleCount = sampleTimestamps.length;
+
     for (int i = 0; i < sampleCount; i++) {
       // Read wheel positions and deltas from each module
       SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
@@ -190,7 +186,12 @@ public class Drive extends SubsystemBase {
                 modulePositions[moduleIndex].angle);
         lastModulePositions[moduleIndex] = modulePositions[moduleIndex];
       }
-
+      
+      SwerveModuleState[] moduleStates = new SwerveModuleState[4];
+      for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
+        moduleStates[moduleIndex] = modules[moduleIndex].getOdometryStates()[i];
+      }
+ 
       // Update gyro angle
       if (gyroInputs.connected) {
         // Use the real gyro angle
@@ -203,10 +204,11 @@ public class Drive extends SubsystemBase {
 
       // Apply update
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
+      RobotState.get_instance().poseEstimator.updateOdometry(new VSwervePoseEstimator.OdometryObservation(modulePositions, moduleStates, rawGyroRotation, sampleTimestamps[i]));
     }
     RobotState.get_instance().robotPose = poseEstimator.getEstimatedPosition();
     Logger.recordOutput("Odometry/CurrentPosition", poseEstimator.getEstimatedPosition());
-
+    Logger.recordOutput("Odometry/TCurrentPosition", RobotState.get_instance().poseEstimator.getEstimatedPose());
 
     //Note: the sceduler runs each subsystem's periodic method first. This is important so the heading controller does not get outdated data since it will be using the global state.
     //guess this does not matter anymore.
@@ -224,68 +226,21 @@ public class Drive extends SubsystemBase {
         }
         break;
       case Auto:
+        //I am now realizing that pathplanner will just call run runVelocity so these drive modes are just to make sure the (dang it I just realized I'm an idiot and may need to make an autoController). 
         //speeds = headingController.update(speeds, Rotation2d.fromRadians(gyroInputs.yawPosition.getRadians() + (speeds.omegaRadiansPerSecond / 50)));
+        
         break;
       case Auto_Set_Heading:
         //speeds = headingontroller.update(speeds, new Rotation2d());
         break;
     }
+    
     Logger.recordOutput("Drive/Speeds", speeds);
-
-    skidDetection();
+    
 
     runVelocity(speeds);
   }
 
-  private void skidDetection() {
-    var states = getModuleStates();
-
-    var current = kinematics.toChassisSpeeds(getModuleStates());
-
-    int[] vels = new int[4];
-
-    var positions = getModulePositions();
-    SimpleMatrix[] wheelmatrixes = new SimpleMatrix[4];
-
-    for (int i = 0; i >= 3; i++) {
-      var x = states[i].speedMetersPerSecond * Math.cos(states[i].angle.getRadians());
-      var y = states[i].speedMetersPerSecond * Math.sin(states[i].angle.getRadians());
-
-      double[] warray = {x, y};
-      wheelmatrixes[i] = new SimpleMatrix(warray);
-
-      double[] darray = {getModuleTranslations()[i].getX(), getModuleTranslations()[i].getY()};
-      SimpleMatrix tMatrix = new SimpleMatrix(darray);
-      
-      double[] varray = {current.vxMetersPerSecond, current.vyMetersPerSecond};
-      SimpleMatrix cMatrix = new SimpleMatrix(varray);
-
-
-      
-
-    }
-    
-    
-
-
-    //get the fastest and slowest moduless
-    double highest = 0;
-    double lowest = 0;
-    for (SwerveModuleState i : states) {
-      if (i.speedMetersPerSecond > highest) highest = i.speedMetersPerSecond;
-      else if (i.speedMetersPerSecond < lowest) lowest = i.speedMetersPerSecond;
-    }
-    
-
-    try {
-      var stddev = Math.pow(highest/lowest, 8) / 10;
-      Logger.recordOutput("Drive/Temp/stateStddev", stddev);
-      //TODO: find a way to tell the pose estimator to not trust the odometry at this point based on the about stddev
-    } catch (ArithmeticException e) {
-      //I am ignoring divide by zeros here because at that point the robot is probably stopped.
-      //might fix this after some testing
-    }
-  }
 
   public void updateTeleopInputs(double x, double y, double omega) {
     teleopController.updateInputs(x, y, omega);
@@ -322,7 +277,7 @@ public class Drive extends SubsystemBase {
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_LINEAR_SPEED);
+    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, DriveConstants.MAX_LINEAR_SPEED);
 
     // Send setpoints to modules
     SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
@@ -411,21 +366,16 @@ public class Drive extends SubsystemBase {
 
   /** Returns the maximum linear speed in meters per sec. */
   public double getMaxLinearSpeedMetersPerSec() {
-    return MAX_LINEAR_SPEED;
+    return DriveConstants.MAX_LINEAR_SPEED;
   }
 
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
-    return MAX_ANGULAR_SPEED;
+    return DriveConstants.MAX_ANGULAR_SPEED;
   }
 
   /** Returns an array of module translations. */
   public static Translation2d[] getModuleTranslations() {
-    return new Translation2d[] {
-      new Translation2d(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0),
-      new Translation2d(TRACK_WIDTH_X / 2.0, -TRACK_WIDTH_Y / 2.0),
-      new Translation2d(-TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0),
-      new Translation2d(-TRACK_WIDTH_X / 2.0, -TRACK_WIDTH_Y / 2.0)
-    };
+    return DriveConstants.getModuleTranslations();
   }
 }

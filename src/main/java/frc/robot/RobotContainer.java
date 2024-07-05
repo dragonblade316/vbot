@@ -59,7 +59,7 @@ import frc.robot.subsystems.intake.IntakeIOSparkMax;
  */
 public class RobotContainer {
   // Subsystems
-  //private final Drive drive;
+  private final Drive drive;
   private final Flywheel flywheel;
   private final Intake intake;
 //   private final Carrier carrier;
@@ -90,13 +90,13 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
-        // drive =
-        //     new Drive(
-        //         new GyroIOPigeon2(false),
-        //         new ModuleIOSparkMax(0),
-        //         new ModuleIOSparkMax(1),
-        //         new ModuleIOSparkMax(2),
-        //         new ModuleIOSparkMax(3));
+        drive =
+            new Drive(
+                new GyroIOPigeon2(false),
+                new ModuleIOSparkMax(0),
+                new ModuleIOSparkMax(1),
+                new ModuleIOSparkMax(2),
+                new ModuleIOSparkMax(3));
         flywheel = new Flywheel(new FlywheelIOSparkMax());
         intake = new Intake(new IntakeIOSparkMax());
         //carrier = new Carrier(new CarrierIOSparkMax());
@@ -104,13 +104,13 @@ public class RobotContainer {
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
-        // drive =
-        //     new Drive(
-        //         new GyroIO() {},
-        //         new ModuleIOSim(),
-        //         new ModuleIOSim(),
-        //         new ModuleIOSim(),
-        //         new ModuleIOSim());
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim());
         flywheel = new Flywheel(new FlywheelIOSim());
         intake = new Intake(new IntakeIOSim());
         // carrier = new Carrier(new CarrierIOSim());
@@ -118,13 +118,13 @@ public class RobotContainer {
 
       default:
         // Replayed robot, disable IOdawd implementations
-        // drive =
-        //     new Drive(
-        //         new GyroIO() {},
-        //         new ModuleIO() {},
-        //         new ModuleIO() {},
-        //         new ModuleIO() {},
-        //         new ModuleIO() {});
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {});
         flywheel = new Flywheel(new FlywheelIO() {});
         intake = new Intake(new IntakeIO() {});
         // carrier = new Carrier(new CarrierIO() {});
@@ -200,12 +200,12 @@ public class RobotContainer {
     button.whileTrue(Commands.startEnd(() -> intake.IntakeIn(), () -> intake.stop(), intake));
     //button.whileTrue(Commands.startEnd(() -> flywheel.runVelocity(10), () -> flywheel.runVelocity(10), flywheel));
 
-    // drive.setDefaultCommand(
-    //     new RunCommand(
-    //         () -> drive.updateTeleopInputs(rjoy.getY(), rjoy.getX(), -ljoy.getX()), 
-    //         drive
-    //     )
-    // );
+    drive.setDefaultCommand(
+        new RunCommand(
+            () -> drive.updateTeleopInputs(rjoy.getY(), rjoy.getX(), -ljoy.getX()), 
+            drive
+        )
+    );
 
     //button.whileTrue(Commands.startEnd(() -> drive.setHeading(() -> Rotation2d.fromDegrees(90)), () -> drive.clearHeading()));
     //this may be useful later but idk

@@ -1,10 +1,14 @@
 package frc.robot.util.Odometry;
 
+import org.ejml.data.ZMatrix;
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.Timestamp;
 
 import edu.wpi.first.math.estimator.KalmanFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
@@ -31,16 +35,30 @@ public class VSwervePoseEstimator {
     private double visionFOM = 0;
 
     private TimeInterpolatableBuffer<Pose2d> poseBuffer = TimeInterpolatableBuffer.createBuffer(2);
-   
-    class OdometryObservation {
+    private VisionObservation latestVisionObservation = null;
+
+    public static class OdometryObservation {
         SwerveModulePosition[] positions;
         SwerveModuleState[] states;
         Rotation2d gyroAngle;
         double timestamp;
+
+        public OdometryObservation(
+            SwerveModulePosition[] positions,
+            SwerveModuleState[] states,
+            Rotation2d gyroAngle,
+            double timestamp) {
+            
+            this.positions = positions;
+            this.states = states;
+            this.gyroAngle = gyroAngle;
+            this.timestamp = timestamp;
+        }
     }
 
-    class VisionObservation {
+    public class VisionObservation {
         Pose2d pose;
+        double timestamp;
     }
 
 
@@ -48,6 +66,7 @@ public class VSwervePoseEstimator {
     public VSwervePoseEstimator(SwerveDriveKinematics kinematics, Rotation2d gyroAngle, SwerveModulePosition[] positions, Pose2d pose) {
         this.kinematics = kinematics;
         this.gyroOffset = pose.getRotation().minus(gyroAngle);
+        this.previousAngle = pose.getRotation().plus(gyroOffset);
         previousPositions = positions;
         estimatedPose = pose;
     }
@@ -56,6 +75,17 @@ public class VSwervePoseEstimator {
     public void updateOdometry(OdometryObservation observation) {
         //detect skidding
         double skiddingRatio = getSkiddingRatio(observation.states, kinematics);
+        System.out.println(skiddingRatio);
+
+        //TODO: tune this
+        if (skiddingRatio > 2 ) odometryFOM += 0.2;
+
+        Logger.recordOutput("Odometry/SkidRatio", skiddingRatio);
+        Logger.recordOutput("Odometry/OFOM", odometryFOM);
+        
+
+        // Set fom and invalidate modules if nececary
+        //TODO: figure out how to invalidate;
 
         Twist2d twist = kinematics.toTwist2d(new SwerveDriveWheelPositions(previousPositions), new SwerveDriveWheelPositions(observation.positions));
         previousPositions = observation.positions;
@@ -64,8 +94,8 @@ public class VSwervePoseEstimator {
         // Update dtheta for twist if gyro connected
         twist =
             new Twist2d(
-                twist.dx, twist.dy, observation.gyroAngle.minus(previousAngle).getRadians());
-        previousAngle = observation.gyroAngle;
+                twist.dx, twist.dy, observation.gyroAngle.plus(gyroOffset).minus(previousAngle).getRadians());
+        previousAngle = observation.gyroAngle.plus(gyroOffset);
         }
         // Add twist to odometry pose
         //odometryPose = odometryPose.exp(twist);
@@ -73,17 +103,23 @@ public class VSwervePoseEstimator {
         poseBuffer.addSample(observation.timestamp, estimatedPose);
         // Calculate diff from last odometry pose and add onto pose estimate
         estimatedPose = estimatedPose.exp(twist);
-
-
     }
 
     //going to need to find some 
-    public void updateVision() {
+    public void updateVision(VisionObservation observation) {
         
+        var tempOPose = multiplyPose(estimatedPose, odometryFOM);
+        var tempVPose = multiplyPose(observation.pose, visionFOM);
+
+        estimatedPose = new Pose2d(tempOPose.getX() + tempVPose.getX(), tempOPose.getY() + tempVPose.getY(), tempOPose.getRotation().plus(tempVPose.getRotation())).div(odometryFOM + visionFOM);
+    }
+
+    private Pose2d multiplyPose(Pose2d pose, double multiplier) {
+        return new Pose2d(pose.getX() * multiplier, pose.getY() * multiplier, pose.getRotation().times(multiplier));
     }
 
     public Pose2d getEstimatedPose() {
-        return null;
+        return estimatedPose;
     }
     
     // public Pose2d update(Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {

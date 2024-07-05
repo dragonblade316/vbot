@@ -54,9 +54,9 @@ public class TeleopController {
                 && DriverStation.getAlliance().get() == Alliance.Red;
           
         var speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-            linearVelocity.getX() * DriveConstants.MAX_LINEAR_SPEED_MPS,
-            linearVelocity.getY() * DriveConstants.MAX_LINEAR_SPEED_MPS,
-            omega * DriveConstants.MAX_ANGULAR_SPEED_RADS,
+            linearVelocity.getX() * DriveConstants.MAX_LINEAR_SPEED,
+            linearVelocity.getY() * DriveConstants.MAX_LINEAR_SPEED,
+            omega * DriveConstants.MAX_ANGULAR_SPEED,
             isFlipped
                 ? RobotState.get_instance().robotPose.getRotation().plus(new Rotation2d(Math.PI))
                 : RobotState.get_instance().robotPose.getRotation());

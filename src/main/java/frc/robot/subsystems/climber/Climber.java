@@ -30,7 +30,7 @@ public class Climber extends SubsystemBase {
     }
 
     public void climberUp() {
-
+        
     }
 
     public void climberDown() {

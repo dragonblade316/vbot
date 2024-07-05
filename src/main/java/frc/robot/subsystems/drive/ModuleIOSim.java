@@ -55,6 +55,7 @@ public class ModuleIOSim implements ModuleIO {
 
     inputs.odometryTimestamps = new double[] {Timer.getFPGATimestamp()};
     inputs.odometryDrivePositionsRad = new double[] {inputs.drivePositionRad};
+    inputs.odometryDriveVelocitiesRadPerSecond = new double[] {inputs.driveVelocityRadPerSec};
     inputs.odometryTurnPositions = new Rotation2d[] {inputs.turnPosition};
   }
 

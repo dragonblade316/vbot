@@ -38,6 +38,7 @@ public class Module {
   private Double speedSetpoint = null; // Setpoint for closed loop control, null for open loop
   private Rotation2d turnRelativeOffset = null; // Relative + Offset = Absolute
   private SwerveModulePosition[] odometryPositions = new SwerveModulePosition[] {};
+  private SwerveModuleState[] odometryStates = new SwerveModuleState[] {};
 
   public Module(ModuleIO io, int index) {
     this.io = io;
@@ -122,6 +123,14 @@ public class Module {
               turnRelativeOffset != null ? turnRelativeOffset : new Rotation2d());
       odometryPositions[i] = new SwerveModulePosition(positionMeters, angle);
     }
+    odometryStates = new SwerveModuleState[sampleCount];
+    for (int i = 0; i < sampleCount; i++) {
+      double velocity = inputs.odometryDriveVelocitiesRadPerSecond[i] * WHEEL_RADIUS;
+      Rotation2d angle =
+          inputs.odometryTurnPositions[i].plus(
+              turnRelativeOffset != null ? turnRelativeOffset : new Rotation2d());
+      odometryStates[i] = new SwerveModuleState(velocity, angle);
+    }
   }
 
   /** Runs the module with the specified setpoint state. Returns the optimized state. */
@@ -195,6 +204,10 @@ public class Module {
   /** Returns the module positions received this cycle. */
   public SwerveModulePosition[] getOdometryPositions() {
     return odometryPositions;
+  }
+
+  public SwerveModuleState[] getOdometryStates() {
+    return odometryStates;
   }
 
   /** Returns the timestamps of the samples received this cycle. */
