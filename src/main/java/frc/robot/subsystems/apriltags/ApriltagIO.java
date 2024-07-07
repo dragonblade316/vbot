@@ -3,6 +3,7 @@ package frc.robot.subsystems.apriltags;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Twist3d;
+import edu.wpi.first.units.Measure;
 
 import java.util.ArrayList;
 
@@ -16,21 +17,9 @@ public interface ApriltagIO {
         
         int targetsDetected = 0;
         Pose2d robotPose = new Pose2d();
+        double distanceToClosestTargetMeters = 0;
         double timestamp = 0;
         
-        //aprilTagEntry[] tagEntries = null;
-
-        
-    }
-
-    public class aprilTagEntry {
-        int id;
-        double distanceMetersToRobot;
-
-        public aprilTagEntry(int id, double distanceMetersToRobot) {
-            this.id = id;
-            this.distanceMetersToRobot = distanceMetersToRobot;
-        }
     }
 
     public default void updateInputs(ApriltagIOInputs inputs) {}

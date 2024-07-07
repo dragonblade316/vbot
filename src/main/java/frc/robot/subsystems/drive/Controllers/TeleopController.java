@@ -58,8 +58,8 @@ public class TeleopController {
             linearVelocity.getY() * DriveConstants.MAX_LINEAR_SPEED,
             omega * DriveConstants.MAX_ANGULAR_SPEED,
             isFlipped
-                ? RobotState.get_instance().robotPose.getRotation().plus(new Rotation2d(Math.PI))
-                : RobotState.get_instance().robotPose.getRotation());
+                ? RobotState.get_instance().poseEstimator.getEstimatedPose().getRotation().plus(new Rotation2d(Math.PI))
+                : RobotState.get_instance().poseEstimator.getEstimatedPose().getRotation());
 
         Logger.recordOutput("Drive/TeleopControllerOutput", speeds);
         return speeds;

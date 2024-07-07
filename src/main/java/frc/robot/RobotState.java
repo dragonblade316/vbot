@@ -1,5 +1,8 @@
 package frc.robot;
 
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -30,9 +33,17 @@ public class RobotState {
         new Pose2d()
     );
 
-    //drive base
-    public Pose2d robotPose = new Pose2d();
-    public Twist2d translationVelocity = new Twist2d();
+    //ngl I saw the record keywork in the mech advantage codebase and decided to try it out
+    //TODO: replace these constants with actual math
+    public static record AimingFunctions() {
+        public static Supplier<Rotation2d> armAngle = () -> Rotation2d.fromDegrees(20);
+        public static Supplier<Rotation2d> heading = () -> Rotation2d.fromDegrees(0);
+        public static DoubleSupplier flywheelSpeed = () -> 0;
+    }
+
+    //drive base: (these will be completely removed in favor of the VSwervePoseEstimator)
+    // public Pose2d robotPose = new Pose2d();
+    // public Twist2d translationVelocity = new Twist2d();
 
     //climber
     public boolean climbersUp = false;

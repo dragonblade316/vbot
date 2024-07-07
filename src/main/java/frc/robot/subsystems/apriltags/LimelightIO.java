@@ -19,12 +19,12 @@ public class LimelightIO implements ApriltagIO {
             poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
         }
         
+        inputs.robotPose = poseEstimate.pose;
+        inputs.targetsDetected = poseEstimate.tagCount;
+        
         inputs.timestamp = poseEstimate.timestampSeconds;
         
-        //inputs.tagEntries = new aprilTagEntry[poseEstimate.rawFiducials.length];
-        for (int i = 0; i <= poseEstimate.rawFiducials.length -1; i++) {
-            //inputs.tagEntries[i] = new aprilTagEntry(poseEstimate.rawFiducials[i].id, poseEstimate.rawFiducials[i].distToRobot);
-        }
+        
 
         
     }

@@ -15,6 +15,8 @@ package frc.robot.subsystems.flywheel;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -29,6 +31,8 @@ public class Flywheel extends SubsystemBase {
   private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
   private final SimpleMotorFeedforward ffModel;
   private final SysIdRoutine sysId;
+
+  private DoubleSupplier velocityRPM = () -> 0;
 
   /** Creates a new Flywheel. */
   public Flywheel(FlywheelIO io) {
@@ -69,6 +73,12 @@ public class Flywheel extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Flywheel", inputs);
+
+
+    // Log flywheel setpoint
+    Logger.recordOutput("Flywheel/SetpointRPM", velocityRPM.getAsDouble());
+    var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM.getAsDouble());
+    io.setVelocity(velocityRadPerSec, ffModel.calculate(velocityRadPerSec));
   }
 
   /** Run open loop at the specified voltage. */
@@ -77,12 +87,8 @@ public class Flywheel extends SubsystemBase {
   }
 
   /** Run closed loop at the specified velocity. */
-  public void runVelocity(double velocityRPM) {
-    var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM);
-    io.setVelocity(velocityRadPerSec, ffModel.calculate(velocityRadPerSec));
-
-    // Log flywheel setpoint
-    Logger.recordOutput("Flywheel/SetpointRPM", velocityRPM);
+  public void setVelocity(DoubleSupplier velocityRPM) {
+    this.velocityRPM = velocityRPM;
   }
 
   /** Stops the flywheel. */

@@ -38,10 +38,10 @@ public class Intake extends SubsystemBase {
                 break;
             case SIM:
                 feedforward = new SimpleMotorFeedforward(0, 0);
-                io.setPID(1, 0, 0);
+                io.setPID(0.001, 0, 0);
                 break;
             default:
-                feedforward = new SimpleMotorFeedforward(0, 0);
+                feedforward = new SimpleMotorFeedforward(0.0, 0);
                 io.setPID(0, 0, 0);
                 break;
         }

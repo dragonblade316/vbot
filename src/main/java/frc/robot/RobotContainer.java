@@ -18,7 +18,9 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathConstraints;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -41,6 +43,7 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
+import frc.robot.subsystems.drive.Drive.DriveMode;
 import frc.robot.subsystems.extender.Extender;
 import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.flywheel.FlywheelIO;
@@ -112,8 +115,7 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim());
         flywheel = new Flywheel(new FlywheelIOSim());
-        intake = new Intake(new IntakeIOSim());
-        // carrier = new Carrier(new CarrierIOSim());
+        intake = new Intake(new IntakeIOSim());   
         break;
 
       default:
@@ -199,7 +201,9 @@ public class RobotContainer {
     
     button.whileTrue(Commands.startEnd(() -> intake.IntakeIn(), () -> intake.stop(), intake));
     //button.whileTrue(Commands.startEnd(() -> flywheel.runVelocity(10), () -> flywheel.runVelocity(10), flywheel));
-
+    var con = new PathConstraints(5, 3, 720, 260);
+    //button.whileTrue(AutoBuilder.pathfindToPose(new Pose2d(10.0, 10.0, Rotation2d.fromDegrees(0)), con));
+    
     drive.setDefaultCommand(
         new RunCommand(
             () -> drive.updateTeleopInputs(rjoy.getY(), rjoy.getX(), -ljoy.getX()), 
@@ -252,5 +256,14 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  //init functions, called by Robot.java
+  public void auto() {
+    drive.setMode(DriveMode.Auto);
+  }
+
+  public void teleop() {
+    drive.setMode(DriveMode.Teleop);
   }
 }

@@ -10,5 +10,10 @@ public class Apriltags extends SubsystemBase {
         //       Also, you can call addChild(name, sendableChild) to associate sendables with the subsystem
         //       such as SpeedControllers, Encoders, DigitalInputs, etc.
     }
+
+    @Override
+    public void periodic() {
+        
+    }
 }
 

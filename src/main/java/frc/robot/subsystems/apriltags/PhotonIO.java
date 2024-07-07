@@ -18,8 +18,8 @@ public class PhotonIO implements ApriltagIO {
 
     public PhotonIO(String name) {
         cam = new PhotonCamera(name);
-        poseEstimator = new PhotonPoseEstimator(field, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, null);
         field = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+        poseEstimator = new PhotonPoseEstimator(field, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, null);
     }
 
     @Override
@@ -27,9 +27,15 @@ public class PhotonIO implements ApriltagIO {
         var results = cam.getLatestResult().getMultiTagResult();
         var pose = poseEstimator.update();
 
-        pose.get().targetsUsed.get(4).getBestCameraToTarget();
+        if (pose.isEmpty()) {
+            return;
+        }
 
         inputs.robotPose = pose.get().estimatedPose.toPose2d();
+        inputs.targetsDetected = pose.get().targetsUsed.size();
+        //TODO: set this
+        inputs.distanceToClosestTargetMeters = 0;
+        inputs.timestamp = pose.get().timestampSeconds;
 
         //inputs.robotPose = ;
     }

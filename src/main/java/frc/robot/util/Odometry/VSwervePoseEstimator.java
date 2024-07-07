@@ -114,6 +114,10 @@ public class VSwervePoseEstimator {
         estimatedPose = new Pose2d(tempOPose.getX() + tempVPose.getX(), tempOPose.getY() + tempVPose.getY(), tempOPose.getRotation().plus(tempVPose.getRotation())).div(odometryFOM + visionFOM);
     }
 
+    public void setPose(Pose2d pose) {
+        estimatedPose = pose;
+    }
+
     private Pose2d multiplyPose(Pose2d pose, double multiplier) {
         return new Pose2d(pose.getX() * multiplier, pose.getY() * multiplier, pose.getRotation().times(multiplier));
     }

@@ -22,7 +22,7 @@ public class HeadingController {
     }
 
     public ChassisSpeeds update(ChassisSpeeds input) {
-        input.omegaRadiansPerSecond = controller.calculate(RobotState.get_instance().robotPose.getRotation().getRadians(), heading.get().getRadians());
+        input.omegaRadiansPerSecond = controller.calculate(RobotState.get_instance().poseEstimator.getEstimatedPose().getRotation().getRadians(), heading.get().getRadians());
         Logger.recordOutput("Drive/TargetHeading", heading.get());
         return input;
     }

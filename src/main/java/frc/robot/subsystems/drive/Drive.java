@@ -64,7 +64,6 @@ public class Drive extends SubsystemBase {
 
   public enum DriveMode {
     Teleop,
-    Set_Heading,
     Auto,
     Auto_Set_Heading
   }
@@ -206,7 +205,7 @@ public class Drive extends SubsystemBase {
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
       RobotState.get_instance().poseEstimator.updateOdometry(new VSwervePoseEstimator.OdometryObservation(modulePositions, moduleStates, rawGyroRotation, sampleTimestamps[i]));
     }
-    RobotState.get_instance().robotPose = poseEstimator.getEstimatedPosition();
+    //RobotState.get_instance().robotPose = poseEstimator.getEstimatedPosition();
     Logger.recordOutput("Odometry/CurrentPosition", poseEstimator.getEstimatedPosition());
     Logger.recordOutput("Odometry/TCurrentPosition", RobotState.get_instance().poseEstimator.getEstimatedPose());
 
@@ -260,6 +259,10 @@ public class Drive extends SubsystemBase {
 
   public void clearAutoHeading() {
     PPHolonomicDriveController.setRotationTargetOverride(() -> Optional.empty());
+  }
+
+  public void setMode(DriveMode mode) {
+    currentDriveMode = mode;
   }
 
   /**

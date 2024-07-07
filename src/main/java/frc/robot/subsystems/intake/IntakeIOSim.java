@@ -17,10 +17,11 @@ public class IntakeIOSim implements IntakeIO {
     private boolean closedLoop = false;
 
     public IntakeIOSim() {
-        motor = new DCMotorSim(DCMotor.getNEO(1), 1, 0.001);
+        motor = new DCMotorSim(DCMotor.getNEO(1), 5, 0.001);
     }
 
     public void updateInputs(IntakeIOInputs inputs) {
+        motor.update(0.02);
         inputs.appliedVolts = motor.getOutput(0);
         inputs.velocityRPM = motor.getAngularVelocityRPM();
 
