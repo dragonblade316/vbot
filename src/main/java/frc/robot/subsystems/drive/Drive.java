@@ -47,6 +47,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.RobotState;
+import frc.robot.subsystems.drive.Controllers.AutoController;
 import frc.robot.subsystems.drive.Controllers.HeadingController;
 import frc.robot.subsystems.drive.Controllers.TeleopController;
 import frc.robot.util.LocalADStarAK;
@@ -68,8 +69,9 @@ public class Drive extends SubsystemBase {
     Auto_Set_Heading
   }
 
-  private DriveMode currentDriveMode = DriveMode.Teleop;
+  private DriveMode currentDriveMode = DriveMode.Auto;
   private TeleopController teleopController = new TeleopController();
+  private AutoController autoController = new AutoController();
   private HeadingController headingController = null;
 
 
@@ -107,7 +109,7 @@ public class Drive extends SubsystemBase {
         this::getPose,
         this::setPose,
         () -> kinematics.toChassisSpeeds(getModuleStates()),
-        this::runVelocity,
+        (speeds) -> autoController.updateInputs(speeds),
         new HolonomicPathFollowerConfig(
             DriveConstants.MAX_LINEAR_SPEED, DriveConstants.DRIVE_BASE_RADIUS, new ReplanningConfig()),
         () ->
@@ -212,6 +214,8 @@ public class Drive extends SubsystemBase {
     //Note: the sceduler runs each subsystem's periodic method first. This is important so the heading controller does not get outdated data since it will be using the global state.
     //guess this does not matter anymore.
 
+    Logger.recordOutput("Drive/DriveMode", currentDriveMode);
+
     ChassisSpeeds speeds = new ChassisSpeeds();
     switch (currentDriveMode) {
       case Teleop:
@@ -227,6 +231,7 @@ public class Drive extends SubsystemBase {
       case Auto:
         //I am now realizing that pathplanner will just call run runVelocity so these drive modes are just to make sure the (dang it I just realized I'm an idiot and may need to make an autoController). 
         //speeds = headingController.update(speeds, Rotation2d.fromRadians(gyroInputs.yawPosition.getRadians() + (speeds.omegaRadiansPerSecond / 50)));
+        speeds = autoController.update();
         
         break;
       case Auto_Set_Heading:
@@ -288,6 +293,8 @@ public class Drive extends SubsystemBase {
       // The module returns the optimized state, useful for logging
       optimizedSetpointStates[i] = modules[i].runSetpoint(setpointStates[i]);
     }
+
+    System.out.println("op " + VSwervePoseEstimator.getSkiddingRatio(optimizedSetpointStates, kinematics));
 
     // Log setpoint states
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);

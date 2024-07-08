@@ -19,6 +19,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -75,7 +76,6 @@ public class RobotContainer {
   private final Joystick ljoy = new Joystick(1);
   private final Joystick buttonPanel = new Joystick(2);
 
-  JoystickButton button = new JoystickButton(rjoy, 1);
 
   JoystickButton intakeButton;
   JoystickButton fireButton;
@@ -135,7 +135,8 @@ public class RobotContainer {
 
     driverChooser = new LoggedDashboardChooser<>("Driver");
     driverChooser.addDefaultOption("Default", Driver.DEFAULT);
-
+    
+    
     // Set up auto routines
     // NamedCommands.registerCommand(
     //     "Run Flywheel",
@@ -183,6 +184,8 @@ public class RobotContainer {
     // autoChooser.addOption(
     //     "Carrier SysId (Dynamic Reverse)", carrier.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
+    autoChooser.addOption("chortest", AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory("NewPath")));
+
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -199,7 +202,7 @@ public class RobotContainer {
     defaultDriverBindings();
     
     
-    button.whileTrue(Commands.startEnd(() -> intake.IntakeIn(), () -> intake.stop(), intake));
+    intakeButton.whileTrue(Commands.startEnd(() -> intake.IntakeIn(), () -> intake.stop(), intake));
     //button.whileTrue(Commands.startEnd(() -> flywheel.runVelocity(10), () -> flywheel.runVelocity(10), flywheel));
     var con = new PathConstraints(5, 3, 720, 260);
     //button.whileTrue(AutoBuilder.pathfindToPose(new Pose2d(10.0, 10.0, Rotation2d.fromDegrees(0)), con));
@@ -241,11 +244,11 @@ public class RobotContainer {
 
 
   private void defaultDriverBindings() {
-
+    intakeButton = new JoystickButton(rjoy, 0);
   }
 
   private void simDriverBindings() {
-
+    intakeButton = new JoystickButton(rjoy, 0);
   }
 
 
