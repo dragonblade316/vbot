@@ -23,6 +23,9 @@ public class Intake extends SubsystemBase {
     private IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
     private SysIdRoutine sysId;
 
+    //I just had this thought earlier today. By monitoring current/voltage spikes we may be able to detect when the intake jams and automatically attempt to fix it
+    private boolean isjammed = false;
+
     
 
     public Intake(IntakeIO io) {

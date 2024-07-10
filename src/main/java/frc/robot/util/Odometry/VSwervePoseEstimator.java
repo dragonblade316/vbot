@@ -7,7 +7,6 @@ import java.util.TreeMap;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -18,6 +17,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveWheelPositions;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 
 
 //Inspired by/copyed from orbit, mechanical advantage, and the wpilib PoseEstimator class
@@ -34,6 +34,11 @@ public class VSwervePoseEstimator {
 
     private double odometryFOM = 0;
     private double visionFOM = 0;
+
+    private BuiltInAccelerometer accelerometer = new BuiltInAccelerometer();
+    private double prevXAccel = 0.0;
+    private double prevYAccel = 0.0;
+    private double prevOmegaAccel = 0.0;
 
     private TimeInterpolatableBuffer<Pose2d> odometryPoseBuffer = TimeInterpolatableBuffer.createBuffer(2);
     private final NavigableMap<Double, VisionUpdate> visionUpdates = new TreeMap<>();
@@ -315,4 +320,15 @@ public class VSwervePoseEstimator {
     private static Translation2d convertSwerveStateToVelocityVector(SwerveModuleState swerveModuleState) {
         return new Translation2d(swerveModuleState.speedMetersPerSecond, swerveModuleState.angle);
     }
+
+
+    // public double detectCollision() {
+    //     double xAccel = accelerometer.getX();
+    //     double yAccel = accelerometer.getY();
+    //     double omegaAccel = accelerometer.getZ();
+
+    //     double xJerk = (xAccel - prevXAccel) / 0.02;
+    //     double yJerk = (yAccel - prevYAccel) / 0.02;
+    //     double omegaJerk = (omegaAccel - prevOmegaAccel) / 0.02;
+    // }
 }

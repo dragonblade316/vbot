@@ -1,7 +1,9 @@
 package frc.robot.subsystems.apriltags;
 
 
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotState;
 
 public class Apriltags extends SubsystemBase {
     public Apriltags() {
@@ -14,6 +16,7 @@ public class Apriltags extends SubsystemBase {
     @Override
     public void periodic() {
         
+        RobotState.get_instance().poseEstimator.updateVision(null);
     }
 }
 

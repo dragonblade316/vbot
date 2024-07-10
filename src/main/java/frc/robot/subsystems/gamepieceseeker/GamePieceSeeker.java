@@ -10,6 +10,10 @@ public class GamePieceSeeker extends SubsystemBase {
   /** Creates a new GamePieceSeeker. */
   public GamePieceSeeker() {}
 
+  public Translation2d getPieces() {
+    return null;
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
