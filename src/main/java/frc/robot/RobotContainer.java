@@ -26,18 +26,18 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.subsystems.carrier.Carrier;
-import frc.robot.subsystems.carrier.CarrierIO;
-import frc.robot.subsystems.carrier.CarrierIOSim;
-import frc.robot.subsystems.carrier.CarrierIOSparkMax;
 import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.flywheel.FlywheelIO;
 import frc.robot.subsystems.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.flywheel.FlywheelIOSparkMax;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeIO;
-import frc.robot.subsystems.intake.IntakeIOSim;
-import frc.robot.subsystems.intake.IntakeIOSparkMax;
+import frc.robot.subsystems.rollers.carrier.Carrier;
+import frc.robot.subsystems.rollers.carrier.CarrierIO;
+import frc.robot.subsystems.rollers.carrier.CarrierIOSim;
+import frc.robot.subsystems.rollers.carrier.CarrierIOSparkMax;
+import frc.robot.subsystems.rollers.intake.Intake;
+import frc.robot.subsystems.rollers.intake.IntakeIO;
+import frc.robot.subsystems.rollers.intake.IntakeIOSim;
+import frc.robot.subsystems.rollers.intake.IntakeIOSparkMax;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a

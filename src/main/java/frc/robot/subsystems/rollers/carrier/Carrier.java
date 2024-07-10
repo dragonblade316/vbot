@@ -1,4 +1,4 @@
-package frc.robot.subsystems.carrier;
+package frc.robot.subsystems.rollers.carrier;
 
 
 import static edu.wpi.first.units.Units.Volts;
@@ -6,10 +6,12 @@ import static edu.wpi.first.units.Units.Volts;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
+import frc.robot.subsystems.rollers,carrier.CarrierIOInputsAutoLogged;
 
 public class Carrier extends SubsystemBase {
     private CarrierIO io;
@@ -18,9 +20,16 @@ public class Carrier extends SubsystemBase {
     private double setpointRPM = 0;
     private boolean closedLoopControl = true;
 
+    private enum IntakeMode {
+        Intake,
+        Barf,
+        Shoot,
+    }
+
+
+
     private CarrierIOInputsAutoLogged inputs = new CarrierIOInputsAutoLogged();
     private SysIdRoutine sysId;
-
 
     public Carrier(CarrierIO io) {
         switch (Constants.currentMode) {

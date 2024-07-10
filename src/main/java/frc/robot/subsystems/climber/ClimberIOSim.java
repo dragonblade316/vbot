@@ -13,7 +13,7 @@ public class ClimberIOSim implements ClimberIO {
 
 
     public ClimberIOSim() {
-        motor = new DCMotorSim(DCMotor.getNEO(1), (double) 1 /75, 0.0001);
+        motor = new DCMotorSim(DCMotor.getNEO(1), (double) 75, 0.0001);
     }
 
     @Override

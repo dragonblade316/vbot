@@ -20,7 +20,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
-import org.ejml.simple.SimpleMatrix;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -40,7 +39,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -224,7 +222,6 @@ public class Drive extends SubsystemBase {
         //saw a fun idea where a heading controller maintains the heading when there is no rotation input
 
         if (headingController != null) {
-          System.out.println("using controller");
           speeds = headingController.update(speeds);
         }
         break;
@@ -235,7 +232,10 @@ public class Drive extends SubsystemBase {
         
         break;
       case Auto_Set_Heading:
-        //speeds = headingontroller.update(speeds, new Rotation2d());
+        //this mode will be used only in cases when the heading is off after a path and we need to manually more to the correct heading
+        if (headingController != null) {
+          speeds = headingController.update(speeds);
+        }
         break;
     }
     

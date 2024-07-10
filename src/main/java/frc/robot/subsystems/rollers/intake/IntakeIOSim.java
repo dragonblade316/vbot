@@ -1,4 +1,4 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.rollers.intake;
 
 import org.opencv.features2d.Feature2D;
 
@@ -24,6 +24,8 @@ public class IntakeIOSim implements IntakeIO {
         motor.update(0.02);
         inputs.appliedVolts = motor.getOutput(0);
         inputs.velocityRPM = motor.getAngularVelocityRPM();
+        inputs.positionRotations = motor.getAngularPositionRotations();
+        inputs.currentAmps = motor.getCurrentDrawAmps();
 
         if (closedLoop) {
             voltage = MathUtil.clamp(feedback.calculate(motor.getAngularVelocityRPM()) + ffVoltage, -12.0, 12.0);

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.rollers.intake;
 
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
@@ -33,6 +33,7 @@ public class IntakeIOSparkMax implements IntakeIO {
 
     public void updateInputs(IntakeIOInputs inputs) {
         inputs.appliedVolts = motor.getAppliedOutput() * motor.getBusVoltage();
+        inputs.currentAmps = motor.getOutputCurrent();
         inputs.velocityRPM = encoder.getVelocity() / GEAR_RATIO;
         inputs.positionRotations = encoder.getPosition() / GEAR_RATIO;
     }

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.rollers.intake;
 
 import static edu.wpi.first.units.Units.Volts;
 
@@ -10,8 +10,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
-import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOInputsAutoLogged;
+import frc.robot.subsystems.rollers.intake.IntakeIO;
 
 public class Intake extends SubsystemBase {
     private IntakeIO io;
