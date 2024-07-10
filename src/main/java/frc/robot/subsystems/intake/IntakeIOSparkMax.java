@@ -25,6 +25,7 @@ public class IntakeIOSparkMax implements IntakeIO {
         encoder = motor.getEncoder();
         pid = motor.getPIDController();
 
+        //TODO: invert this motor
         //TODO: figure this out
         // encoder.setVelocityConversionFactor(1/5);
         // encoder.setPositionConversionFactor(1/5);

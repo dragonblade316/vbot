@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.gamepieceseeker;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class GamePieceSeeker extends SubsystemBase {

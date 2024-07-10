@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PowerDistribution;
 
 public class CarrierIOSparkMax implements CarrierIO {
+    private static final double GEAR_RATIO = 5;
+
     PowerDistribution pdh = new PowerDistribution();
     DigitalInput sensor;
     CANSparkMax motor;
@@ -42,9 +44,9 @@ public class CarrierIOSparkMax implements CarrierIO {
 
     public void updateInputs(CarrierIOInputs input) {
         input.isPiecePresent = sensor.get();
-        input.appliedVolts = motor.getAppliedOutput();
-        input.velocityRPM = encoder.getVelocity();
-        input.positionRotations = encoder.getPosition();
+        input.appliedVolts = motor.getAppliedOutput() * motor.getBusVoltage();
+        input.velocityRPM = encoder.getVelocity() / GEAR_RATIO;
+        input.positionRotations = encoder.getPosition() / GEAR_RATIO;
     }
 
     public void setVoltage(double voltage) {
@@ -55,7 +57,7 @@ public class CarrierIOSparkMax implements CarrierIO {
     public void setVelocity(double rpm, double ffVoltage) {
         feedback.setReference(
         //idk the ratio right now
-        rpm /* * GEAR_RATIO*/,
+        rpm * GEAR_RATIO,
         ControlType.kVelocity,
         0,
         ffVoltage,

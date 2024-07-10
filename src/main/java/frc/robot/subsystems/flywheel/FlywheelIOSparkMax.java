@@ -14,11 +14,14 @@
 package frc.robot.subsystems.flywheel;
 
 import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkBase.SoftLimitDirection;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkPIDController.ArbFFUnits;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -27,6 +30,7 @@ import edu.wpi.first.math.util.Units;
  */
 public class FlywheelIOSparkMax implements FlywheelIO {
   private static final double GEAR_RATIO = 1;
+  private static final double MAX_VOLTAGE = 9;
 
   private final CANSparkMax leader = new CANSparkMax(10, MotorType.kBrushless);
   private final CANSparkMax follower = new CANSparkMax(14, MotorType.kBrushless);
@@ -45,6 +49,7 @@ public class FlywheelIOSparkMax implements FlywheelIO {
 
     leader.enableVoltageCompensation(12.0);
     leader.setSmartCurrentLimit(30);
+    //pid.setOutputRange(-MAX_VOLTAGE, MAX_VOLTAGE);
 
     leader.burnFlash();
     follower.burnFlash();
@@ -61,6 +66,7 @@ public class FlywheelIOSparkMax implements FlywheelIO {
 
   @Override
   public void setVoltage(double volts) {
+    //leader.setVoltage(MathUtil.clamp(volts, -MAX_VOLTAGE, MAX_VOLTAGE));
     leader.setVoltage(volts);
   }
 

@@ -31,8 +31,8 @@ public class Intake extends SubsystemBase {
     public Intake(IntakeIO io) {
         switch (Constants.currentMode) {
             case REAL:
-                feedforward = new SimpleMotorFeedforward(0.21726, 0.62516);
-                io.setPID(0.39639, 0.00, 0);
+                feedforward = new SimpleMotorFeedforward(0.32269, 0.010463);
+                io.setPID(8.9256E-07, 0.00, 0);
                 
                 break;
             case REPLAY:
@@ -48,7 +48,7 @@ public class Intake extends SubsystemBase {
                 io.setPID(0, 0, 0);
                 break;
         }
-
+        
         this.io = io;
 
         sysId =
@@ -76,12 +76,12 @@ public class Intake extends SubsystemBase {
     }
 
     public void IntakeIn() {
-        setpointRPM = 600;
+        setpointRPM = -600;
         io.setVelocity(setpointRPM, feedforward.calculate(setpointRPM));
     }
 
     public void IntakeOut() {
-        setpointRPM = -300;
+        setpointRPM = 300;
         io.setVelocity(setpointRPM, feedforward.calculate(setpointRPM));
     }
 

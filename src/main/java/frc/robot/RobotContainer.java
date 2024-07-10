@@ -16,36 +16,20 @@ package frc.robot;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.path.PathPlannerPath;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.carrier.Carrier;
 import frc.robot.subsystems.carrier.CarrierIO;
 import frc.robot.subsystems.carrier.CarrierIOSim;
 import frc.robot.subsystems.carrier.CarrierIOSparkMax;
-import frc.robot.subsystems.climber.Climber;
-import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.GyroIO;
-import frc.robot.subsystems.drive.GyroIOPigeon2;
-import frc.robot.subsystems.drive.ModuleIO;
-import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOSparkMax;
-import frc.robot.subsystems.drive.Drive.DriveMode;
-import frc.robot.subsystems.extender.Extender;
 import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.flywheel.FlywheelIO;
 import frc.robot.subsystems.flywheel.FlywheelIOSim;
@@ -63,10 +47,10 @@ import frc.robot.subsystems.intake.IntakeIOSparkMax;
  */
 public class RobotContainer {
   // Subsystems
-  private final Drive drive;
+  //private final Drive drive;
   private final Flywheel flywheel;
   private final Intake intake;
-//   private final Carrier carrier;
+  private final Carrier carrier;
     // private final Arm arm;
     // private final Climber climber;
     // private final Extender extender;
@@ -93,43 +77,44 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOPigeon2(false),
-                new ModuleIOSparkMax(0),
-                new ModuleIOSparkMax(1),
-                new ModuleIOSparkMax(2),
-                new ModuleIOSparkMax(3));
+        // drive =
+        //     new Drive(
+        //         new GyroIOPigeon2(false),
+        //         new ModuleIOSparkMax(0),
+        //         new ModuleIOSparkMax(1),
+        //         new ModuleIOSparkMax(2),
+        //         new ModuleIOSparkMax(3));
         flywheel = new Flywheel(new FlywheelIOSparkMax());
         intake = new Intake(new IntakeIOSparkMax());
-        //carrier = new Carrier(new CarrierIOSparkMax());
+        carrier = new Carrier(new CarrierIOSparkMax());
         break;
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim());
+        // drive =
+        //     new Drive(
+        //         new GyroIO() {},
+        //         new ModuleIOSim(),
+        //         new ModuleIOSim(),
+        //         new ModuleIOSim(),
+        //         new ModuleIOSim());
         flywheel = new Flywheel(new FlywheelIOSim());
         intake = new Intake(new IntakeIOSim());   
+        carrier = new Carrier(new CarrierIOSim());
         break;
 
       default:
         // Replayed robot, disable IOdawd implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {});
+        // drive =
+        //     new Drive(
+        //         new GyroIO() {},
+        //         new ModuleIO() {},
+        //         new ModuleIO() {},
+        //         new ModuleIO() {},
+        //         new ModuleIO() {});
         flywheel = new Flywheel(new FlywheelIO() {});
         intake = new Intake(new IntakeIO() {});
-        // carrier = new Carrier(new CarrierIO() {});
+        carrier = new Carrier(new CarrierIO() {});
         break;
     }
 
@@ -175,16 +160,16 @@ public class RobotContainer {
         "Intake SysId (Dynamic Forward)", intake.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Intake SysId (Dynamic Reverse)", intake.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    // autoChooser.addOption(
-    //     "Carrier SysId (Quasistatic forward)", carrier.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    // autoChooser.addOption(
-    //     "Carrier SysId (Quasistatic reverse)", carrier.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    // autoChooser.addOption(
-    //     "Carrier SysId (Dynamic Forward)", carrier.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    // autoChooser.addOption(
-    //     "Carrier SysId (Dynamic Reverse)", carrier.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Carrier SysId (Quasistatic forward)", carrier.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Carrier SysId (Quasistatic reverse)", carrier.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Carrier SysId (Dynamic Forward)", carrier.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Carrier SysId (Dynamic Reverse)", carrier.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    autoChooser.addOption("chortest", AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory("NewPath")));
+    //autoChooser.addOption("chortest", AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory("NewPath")));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -202,17 +187,17 @@ public class RobotContainer {
     defaultDriverBindings();
     
     
-    intakeButton.whileTrue(Commands.startEnd(() -> intake.IntakeIn(), () -> intake.stop(), intake));
+    intakeButton.whileTrue(Commands.startEnd(() -> intake.IntakeIn(), () -> intake.stop(), intake).alongWith(Commands.startEnd(() -> carrier.carrierIn(), () -> carrier.stop(), carrier)));
     //button.whileTrue(Commands.startEnd(() -> flywheel.runVelocity(10), () -> flywheel.runVelocity(10), flywheel));
     var con = new PathConstraints(5, 3, 720, 260);
     //button.whileTrue(AutoBuilder.pathfindToPose(new Pose2d(10.0, 10.0, Rotation2d.fromDegrees(0)), con));
     
-    drive.setDefaultCommand(
-        new RunCommand(
-            () -> drive.updateTeleopInputs(rjoy.getY(), rjoy.getX(), -ljoy.getX()), 
-            drive
-        )
-    );
+    // drive.setDefaultCommand(
+    //     new RunCommand(
+    //         () -> drive.updateTeleopInputs(rjoy.getY(), rjoy.getX(), -ljoy.getX()), 
+    //         drive
+    //     )
+    // );
 
     //button.whileTrue(Commands.startEnd(() -> drive.setHeading(() -> Rotation2d.fromDegrees(90)), () -> drive.clearHeading()));
     //this may be useful later but idk
@@ -244,11 +229,11 @@ public class RobotContainer {
 
 
   private void defaultDriverBindings() {
-    intakeButton = new JoystickButton(rjoy, 0);
+    intakeButton = new JoystickButton(rjoy, 1);
   }
 
   private void simDriverBindings() {
-    intakeButton = new JoystickButton(rjoy, 0);
+    intakeButton = new JoystickButton(rjoy, 1);
   }
 
 
@@ -263,10 +248,10 @@ public class RobotContainer {
 
   //init functions, called by Robot.java
   public void auto() {
-    drive.setMode(DriveMode.Auto);
+    //drive.setMode(DriveMode.Auto);
   }
 
   public void teleop() {
-    drive.setMode(DriveMode.Teleop);
+    //drive.setMode(DriveMode.Teleop);
   }
 }

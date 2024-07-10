@@ -21,13 +21,12 @@ public class Carrier extends SubsystemBase {
     private CarrierIOInputsAutoLogged inputs = new CarrierIOInputsAutoLogged();
     private SysIdRoutine sysId;
 
-    
 
     public Carrier(CarrierIO io) {
         switch (Constants.currentMode) {
             case REAL:
-                feedforward = new SimpleMotorFeedforward(0, 0);
-                io.setPID(1, 0, 0);
+                feedforward = new SimpleMotorFeedforward(0.30474, 0.010524);
+                io.setPID(6.0404E-07, 0, 0);
                 break;
             case REPLAY:
                 feedforward = new SimpleMotorFeedforward(0, 0);
@@ -70,7 +69,8 @@ public class Carrier extends SubsystemBase {
     }
 
     public void carrierIn() {
-        io.setVelocity(100, feedforward.calculate(setpointRPM));
+        setpointRPM = 600;
+        io.setVelocity(600, feedforward.calculate(setpointRPM));
     }
 
     public void carrierOut() {
@@ -79,16 +79,19 @@ public class Carrier extends SubsystemBase {
     }
 
     public void carrierShoot() {
+        setpointRPM = 400;
         io.setVelocity(400, feedforward.calculate(setpointRPM));
     }
 
     public void stop() {
+        setpointRPM = 0;
         io.setVelocity(0, feedforward.calculate(setpointRPM));
     }
 
     @Override
     public void periodic() {
         io.updateInputs(inputs);
+        Logger.processInputs("Carrier", inputs);
     }
 
 }

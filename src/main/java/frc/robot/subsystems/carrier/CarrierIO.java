@@ -14,7 +14,7 @@ public interface CarrierIO {
     public default void updateInputs(CarrierIOInputs inputs) {}
 
     public default void setVoltage(double voltage) {}
-    public default void setVelocity(double radiansPerSecond, double ffVoltage) {}
+    public default void setVelocity(double rpm, double ffVoltage) {}
     public default void setPID(double kp, double ki, double kd) {}
 
 }
