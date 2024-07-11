@@ -232,7 +232,8 @@ public class Drive extends SubsystemBase {
         
         break;
       case Auto_Set_Heading:
-        //this mode will be used only in cases when the heading is off after a path and we need to manually more to the correct heading
+        //this mode will be used when manual control is desirable. This should not be used with pathplanner since pathplanner has its own heading control 
+        autoController.update();
         if (headingController != null) {
           speeds = headingController.update(speeds);
         }
@@ -252,17 +253,11 @@ public class Drive extends SubsystemBase {
 
   public void setHeading(Supplier<Rotation2d> heading) {
     headingController = new HeadingController(heading);
+    PPHolonomicDriveController.setRotationTargetOverride(() -> Optional.of(heading.get()));
   }
 
   public void clearHeading() {
     headingController = null;
-  }
-
-  public void setAutoHeading(Supplier<Rotation2d> heading) {
-    PPHolonomicDriveController.setRotationTargetOverride(() -> Optional.of(heading.get()));
-  }
-
-  public void clearAutoHeading() {
     PPHolonomicDriveController.setRotationTargetOverride(() -> Optional.empty());
   }
 

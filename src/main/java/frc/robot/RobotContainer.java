@@ -30,6 +30,8 @@ import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.flywheel.FlywheelIO;
 import frc.robot.subsystems.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.flywheel.FlywheelIOSparkMax;
+import frc.robot.subsystems.rollers.Rollers;
+import frc.robot.subsystems.rollers.Rollers.Goal;
 import frc.robot.subsystems.rollers.carrier.Carrier;
 import frc.robot.subsystems.rollers.carrier.CarrierIO;
 import frc.robot.subsystems.rollers.carrier.CarrierIOSim;
@@ -49,11 +51,15 @@ public class RobotContainer {
   // Subsystems
   //private final Drive drive;
   private final Flywheel flywheel;
-  private final Intake intake;
-  private final Carrier carrier;
     // private final Arm arm;
     // private final Climber climber;
     // private final Extender extender;
+
+  //rollers subsystem and its components
+  private final Rollers rollers;
+  private final Intake intake;
+  private final Carrier carrier;
+
 
   // Controller
   private final Joystick rjoy = new Joystick(0);
@@ -118,6 +124,8 @@ public class RobotContainer {
         break;
     }
 
+    rollers = new Rollers(intake, carrier);
+
     driverChooser = new LoggedDashboardChooser<>("Driver");
     driverChooser.addDefaultOption("Default", Driver.DEFAULT);
     
@@ -152,22 +160,27 @@ public class RobotContainer {
         "Flywheel SysId (Dynamic Forward)", flywheel.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Flywheel SysId (Dynamic Reverse)", flywheel.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+    //these are useless now but I dont feel like deleting them yet
+    // autoChooser.addOption(
+    //     "Intake SysId (Quasistatic forward)", intake.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    // autoChooser.addOption(
+    //     "Intake SysId (Quasistatic reverse)", intake.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    // autoChooser.addOption(
+    //     "Intake SysId (Dynamic Forward)", intake.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // autoChooser.addOption(
+    //     "Intake SysId (Dynamic Reverse)", intake.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // autoChooser.addOption(
+    //     "Carrier SysId (Quasistatic forward)", carrier.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    // autoChooser.addOption(
+    //     "Carrier SysId (Quasistatic reverse)", carrier.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    // autoChooser.addOption(
+    //     "Carrier SysId (Dynamic Forward)", carrier.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // autoChooser.addOption(
+    //     "Carrier SysId (Dynamic Reverse)", carrier.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
     autoChooser.addOption(
-        "Intake SysId (Quasistatic forward)", intake.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Intake SysId (Quasistatic reverse)", intake.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Intake SysId (Dynamic Forward)", intake.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Intake SysId (Dynamic Reverse)", intake.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Carrier SysId (Quasistatic forward)", carrier.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Carrier SysId (Quasistatic reverse)", carrier.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Carrier SysId (Dynamic Forward)", carrier.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Carrier SysId (Dynamic Reverse)", carrier.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        "Rollers SysID", rollers.sysIdCommand());
 
     //autoChooser.addOption("chortest", AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory("NewPath")));
 
@@ -187,7 +200,7 @@ public class RobotContainer {
     defaultDriverBindings();
     
     
-    intakeButton.whileTrue(Commands.startEnd(() -> intake.IntakeIn(), () -> intake.stop(), intake).alongWith(Commands.startEnd(() -> carrier.carrierIn(), () -> carrier.stop(), carrier)));
+    intakeButton.whileTrue(Commands.startEnd(() -> rollers.setGoal(Goal.Intake), () -> rollers.setGoal(Goal.Stop), rollers));
     //button.whileTrue(Commands.startEnd(() -> flywheel.runVelocity(10), () -> flywheel.runVelocity(10), flywheel));
     var con = new PathConstraints(5, 3, 720, 260);
     //button.whileTrue(AutoBuilder.pathfindToPose(new Pose2d(10.0, 10.0, Rotation2d.fromDegrees(0)), con));
