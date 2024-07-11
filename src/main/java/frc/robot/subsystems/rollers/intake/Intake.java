@@ -10,10 +10,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
-import frc.robot.subsystems.intake.IntakeIOInputsAutoLogged;
+import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.intake.IntakeIO;
+import frc.robot.subsystems.rollers.GenericRollers;
 
-public class Intake extends SubsystemBase {
+public class Intake implements GenericRollers<Intake.IntakeGoal> {
     private IntakeIO io;
     private SimpleMotorFeedforward feedforward;
     
@@ -21,10 +22,24 @@ public class Intake extends SubsystemBase {
     private boolean closedLoopControl = true;
 
     private IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
-    private SysIdRoutine sysId;
 
     //I just had this thought earlier today. By monitoring current/voltage spikes we may be able to detect when the intake jams and automatically attempt to fix it
     private boolean isjammed = false;
+
+    public IntakeGoal goal = IntakeGoal.Stop;
+    public enum IntakeGoal implements GenericRollers.Goal {
+        Intake(1000),
+        Barf(-600),
+        Stop(0)
+        ;
+        private double goal; 
+        private IntakeGoal(double goal) {
+            this.goal = goal;
+        }
+        public Double getRpmGoal() {
+            return this.goal;
+        }
+    }
 
     
 
@@ -51,29 +66,40 @@ public class Intake extends SubsystemBase {
         
         this.io = io;
 
-        sysId =
-        new SysIdRoutine(
+    }
+
+    // @Override
+    // public void setGoal(Goal goal) {
+    //     this.goal = goal;
+    // }
+
+    public void setGoal(IntakeGoal goal) {
+        this.goal = goal;
+    }
+
+    @Override
+    public IntakeGoal getGoal() {
+        return goal;
+    }
+
+    @Override
+    public SysIdRoutine getSysIdRoutine(Rollers rollers) {
+        return new SysIdRoutine(
             new SysIdRoutine.Config(
                 null,
                 null,
                 null,
                 (state) -> Logger.recordOutput("Intake/SysIdState", state.toString())),
-            new SysIdRoutine.Mechanism((voltage) -> runVolts(voltage.in(Volts)), null, this));
+            new SysIdRoutine.Mechanism((voltage) -> setVoltage(voltage.in(Volts)), null, rollers));
+
     }
 
-    /** Returns a command to run a quasistatic test in the specified direction. */
-    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-        return sysId.quasistatic(direction);
-    }
-
-    /** Returns a command to run a dynamic test in the specified direction. */
-    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-        return sysId.dynamic(direction);
-    }
-
-    public void runVolts(double voltage) {
+    @Override
+    public void setVoltage(double voltage) {
         io.setVoltage(voltage);
     }
+
+
 
     public void IntakeIn() {
         setpointRPM = -600;
@@ -95,6 +121,8 @@ public class Intake extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Intake", inputs);
 
+        io.setVelocity(goal.getRpmGoal(), feedforward.calculate(goal.getRpmGoal()));
+        
         Logger.recordOutput("Intake/SetPointRPM", setpointRPM);
     }
 }

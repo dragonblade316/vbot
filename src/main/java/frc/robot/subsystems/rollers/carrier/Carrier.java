@@ -7,29 +7,39 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
-import frc.robot.subsystems.rollers,carrier.CarrierIOInputsAutoLogged;
+import frc.robot.RobotState;
+import frc.robot.subsystems.rollers.GenericRollers;
+import frc.robot.subsystems.rollers.Rollers;
 
-public class Carrier extends SubsystemBase {
+public class Carrier implements GenericRollers<Carrier.CarrierGoal> {
     private CarrierIO io;
     private SimpleMotorFeedforward feedforward;
     
     private double setpointRPM = 0;
     private boolean closedLoopControl = true;
 
-    private enum IntakeMode {
-        Intake,
-        Barf,
-        Shoot,
+    private CarrierGoal goal = CarrierGoal.Stop;
+    public enum CarrierGoal implements GenericRollers.Goal {
+        Intake(1),
+        Barf(-1),
+        Shoot(5),
+        Stop(0)
+        ;
+        private double rpmGoal;
+        private CarrierGoal(double rpmGoal) {
+            this.rpmGoal = rpmGoal;
+        }
+        public Double getRpmGoal() {
+            return this.rpmGoal;
+        }
     }
 
+    private Notifier notifier = new Notifier(null);
 
 
     private CarrierIOInputsAutoLogged inputs = new CarrierIOInputsAutoLogged();
-    private SysIdRoutine sysId;
 
     public Carrier(CarrierIO io) {
         switch (Constants.currentMode) {
@@ -51,56 +61,56 @@ public class Carrier extends SubsystemBase {
                 break;
         }
 
-        this.io = io;
+        //run 100 time per second
+        notifier.startPeriodic(0.01);
 
-        sysId =
-        new SysIdRoutine(
+        this.io = io;
+    }
+
+    public void setGoal(CarrierGoal goal) {
+        this.goal = goal;
+    }
+
+    public CarrierGoal getGoal() {
+        return goal;
+    }
+
+    @Override
+    public SysIdRoutine getSysIdRoutine(Rollers rollers) {
+        return new SysIdRoutine(
             new SysIdRoutine.Config(
                 null,
                 null,
                 null,
                 (state) -> Logger.recordOutput("Carrier/SysIdState", state.toString())),
-            new SysIdRoutine.Mechanism((voltage) -> runVolts(voltage.in(Volts)), null, this));
+            new SysIdRoutine.Mechanism((voltage) -> setVoltage(voltage.in(Volts)), null, rollers));
     }
 
-    /** Returns a command to run a quasistatic test in the specified direction. */
-    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-        return sysId.quasistatic(direction);
-    }
-
-    /** Returns a command to run a dynamic test in the specified direction. */
-    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-        return sysId.dynamic(direction);
-    }
-
-    public void runVolts(double voltage) {
+    @Override
+    public void setVoltage(double voltage) {
         io.setVoltage(voltage);
-    }
-
-    public void carrierIn() {
-        setpointRPM = 600;
-        io.setVelocity(600, feedforward.calculate(setpointRPM));
-    }
-
-    public void carrierOut() {
-        setpointRPM = -100;
-        io.setVelocity(-100, feedforward.calculate(setpointRPM));
-    }
-
-    public void carrierShoot() {
-        setpointRPM = 400;
-        io.setVelocity(400, feedforward.calculate(setpointRPM));
-    }
-
-    public void stop() {
-        setpointRPM = 0;
-        io.setVelocity(0, feedforward.calculate(setpointRPM));
     }
 
     @Override
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Carrier", inputs);
+
+        if (goal == CarrierGoal.Intake && inputs.isPiecePresent) {
+            goal = CarrierGoal.Stop;
+        }
+
+        RobotState.get_instance().containsPiece = inputs.isPiecePresent;
+
+        io.setVelocity(goal.getRpmGoal(), feedforward.calculate(goal.getRpmGoal()));
+        Logger.recordOutput("Intake/RPMGoal", goal.getRpmGoal());
+    }
+
+    public void checkPeriodic() {
+        if (goal == CarrierGoal.Intake && inputs.isPiecePresent) {
+            goal = CarrierGoal.Stop;
+            periodic();
+        }
     }
 
 }
