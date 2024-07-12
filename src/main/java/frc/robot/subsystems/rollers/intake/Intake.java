@@ -55,8 +55,8 @@ public class Intake implements GenericRollers<Intake.IntakeGoal> {
                 
                 break;
             case SIM:
-                feedforward = new SimpleMotorFeedforward(0, 0);
-                io.setPID(0.001, 0, 0);
+                feedforward = new SimpleMotorFeedforward(0.3, 0.01001);
+                io.setPID(0.0001, 0, 0);
                 break;
             default:
                 feedforward = new SimpleMotorFeedforward(0.0, 0);
@@ -99,23 +99,6 @@ public class Intake implements GenericRollers<Intake.IntakeGoal> {
         io.setVoltage(voltage);
     }
 
-
-
-    public void IntakeIn() {
-        setpointRPM = -600;
-        io.setVelocity(setpointRPM, feedforward.calculate(setpointRPM));
-    }
-
-    public void IntakeOut() {
-        setpointRPM = 300;
-        io.setVelocity(setpointRPM, feedforward.calculate(setpointRPM));
-    }
-
-    public void stop() {
-        setpointRPM = 0;
-        io.setVelocity(setpointRPM, feedforward.calculate(setpointRPM));
-    }
-
     @Override
     public void periodic() {
         io.updateInputs(inputs);
@@ -123,7 +106,7 @@ public class Intake implements GenericRollers<Intake.IntakeGoal> {
 
         io.setVelocity(goal.getRpmGoal(), feedforward.calculate(goal.getRpmGoal()));
         
-        Logger.recordOutput("Intake/SetPointRPM", setpointRPM);
+        Logger.recordOutput("Intake/SetPointRPM", goal.getRpmGoal());
     }
 }
 

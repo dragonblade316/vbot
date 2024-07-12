@@ -36,7 +36,7 @@ public class Arm extends SubsystemBase {
     private boolean climblock = false;
 
     //all of these are in degrees, they will be converted to rads
-    public enum Position {
+    public enum SetGoal {
         TRAVERSE(17),
         AMP(45),
         TRAP(43.5),
@@ -45,12 +45,14 @@ public class Arm extends SubsystemBase {
 
         public final Double angle;
 
-        private Position(double angle) {
+        private SetGoal(double angle) {
             this.angle = angle;
         }
     }
 
     public Arm(ArmIO io) {
+        this.io = io;
+
         switch (Constants.currentMode) {
             case REAL:
                 feedforward = new VArmFeedforward(0, 0, 0);
@@ -62,8 +64,9 @@ public class Arm extends SubsystemBase {
                 break;
 
             default:
-                feedforward = new VArmFeedforward(0, 0, 0);
-                feedback = new PIDController(0, 0, 0);
+                //these guessed values are good enough for now but may need more tuning in the future
+                feedforward = new VArmFeedforward(3, 0, 3);
+                feedback = new PIDController(2, 0, 0);
                 break;
         }
 
@@ -71,12 +74,12 @@ public class Arm extends SubsystemBase {
         setPointState = new TrapezoidProfile.State(inputs.angle.getRadians(), inputs.velocityRadPerSec);
     }
 
-    public void setPosition(Supplier<Rotation2d> angle) {
+    public void setGoal(Supplier<Rotation2d> angle) {
         targetAngle = angle;
     }
 
-    public void setPosition(Position position) {
-        setPosition(() -> Rotation2d.fromDegrees(position.angle));
+    public void setGoal(SetGoal position) {
+        setGoal(() -> Rotation2d.fromDegrees(position.angle));
     }
 
     @Override
@@ -87,10 +90,9 @@ public class Arm extends SubsystemBase {
         //I know this is confusing just bear with me.
         Supplier<Rotation2d> targetAngle = this.targetAngle;
         if (RobotState.get_instance().climbersUp) {
-            targetAngle = () -> Rotation2d.fromDegrees(Position.CLIMB.angle);
+            targetAngle = () -> Rotation2d.fromDegrees(SetGoal.CLIMB.angle);
         }
 
-        //Tomorow we are going to need to figure out how to create a TrapezoidProfile.state setpoint
         var setpointState = profile.calculate(
             0.02, 
             setPointState, new TrapezoidProfile.State(

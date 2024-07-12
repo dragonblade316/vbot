@@ -18,6 +18,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
 import com.pathplanner.lib.path.PathConstraints;
 
+import edu.wpi.first.math.estimator.ExtendedKalmanFilter;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -26,6 +27,15 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.ArmIO;
+import frc.robot.subsystems.arm.ArmIOSim;
+import frc.robot.subsystems.arm.ArmIOSparkMax;
+import frc.robot.subsystems.arm.Arm.SetGoal;
+import frc.robot.subsystems.extender.Extender;
+import frc.robot.subsystems.extender.ExtenderIO;
+import frc.robot.subsystems.extender.ExtenderIOSim;
+import frc.robot.subsystems.extender.ExtenderIOSparkMax;
 import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.flywheel.FlywheelIO;
 import frc.robot.subsystems.flywheel.FlywheelIOSim;
@@ -51,14 +61,14 @@ public class RobotContainer {
   // Subsystems
   //private final Drive drive;
   private final Flywheel flywheel;
-    // private final Arm arm;
+  private final Arm arm;
     // private final Climber climber;
-    // private final Extender extender;
-
+  private final Extender extender;
   //rollers subsystem and its components
   private final Rollers rollers;
   private final Intake intake;
   private final Carrier carrier;
+
 
 
   // Controller
@@ -66,10 +76,10 @@ public class RobotContainer {
   private final Joystick ljoy = new Joystick(1);
   private final Joystick buttonPanel = new Joystick(2);
 
-
   JoystickButton intakeButton;
   JoystickButton fireButton;
-  JoystickButton autoaimButton;
+  JoystickButton autoAimButton;
+  JoystickButton autoAmpButton;
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -91,6 +101,8 @@ public class RobotContainer {
         //         new ModuleIOSparkMax(2),
         //         new ModuleIOSparkMax(3));
         flywheel = new Flywheel(new FlywheelIOSparkMax());
+        arm = new Arm(new ArmIOSparkMax());
+        extender = new Extender(new ExtenderIOSparkMax());
         intake = new Intake(new IntakeIOSparkMax());
         carrier = new Carrier(new CarrierIOSparkMax());
         break;
@@ -105,6 +117,8 @@ public class RobotContainer {
         //         new ModuleIOSim(),
         //         new ModuleIOSim());
         flywheel = new Flywheel(new FlywheelIOSim());
+        arm = new Arm(new ArmIOSim());
+        extender = new Extender(new ExtenderIOSim());
         intake = new Intake(new IntakeIOSim());   
         carrier = new Carrier(new CarrierIOSim());
         break;
@@ -119,6 +133,8 @@ public class RobotContainer {
         //         new ModuleIO() {},
         //         new ModuleIO() {});
         flywheel = new Flywheel(new FlywheelIO() {});
+        arm = new Arm(new ArmIO() {});
+        extender = new Extender(new ExtenderIO() {});
         intake = new Intake(new IntakeIO() {});
         carrier = new Carrier(new CarrierIO() {});
         break;
@@ -201,6 +217,8 @@ public class RobotContainer {
     
     
     intakeButton.whileTrue(Commands.startEnd(() -> rollers.setGoal(Goal.Intake), () -> rollers.setGoal(Goal.Stop), rollers));
+    autoAmpButton.whileTrue(Commands.startEnd(() -> extender.setGoal(frc.robot.subsystems.extender.Extender.Goal.AMP), () -> extender.setGoal(frc.robot.subsystems.extender.Extender.Goal.RETRACTED), extender));
+    fireButton.whileTrue(Commands.startEnd(() -> arm.setGoal(SetGoal.SPEAKER_DEAD_REKON), () -> arm.setGoal(SetGoal.TRAVERSE), arm));
     //button.whileTrue(Commands.startEnd(() -> flywheel.runVelocity(10), () -> flywheel.runVelocity(10), flywheel));
     var con = new PathConstraints(5, 3, 720, 260);
     //button.whileTrue(AutoBuilder.pathfindToPose(new Pose2d(10.0, 10.0, Rotation2d.fromDegrees(0)), con));
@@ -243,6 +261,8 @@ public class RobotContainer {
 
   private void defaultDriverBindings() {
     intakeButton = new JoystickButton(rjoy, 1);
+    autoAmpButton = new JoystickButton(rjoy, 2);
+    fireButton = new JoystickButton(rjoy, 3);
   }
 
   private void simDriverBindings() {

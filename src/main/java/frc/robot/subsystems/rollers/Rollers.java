@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.rollers;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -51,16 +53,22 @@ public class Rollers extends SubsystemBase {
   }
 
   public void setGoal(Goal goal) {
+    Logger.recordOutput("rollers/goal", goal);
     this.goal = goal;
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    intake.periodic();
+    carrier.periodic();
+
 
     if (goal == Goal.Intake && state.containsPiece) {
       goal = Goal.Stop;
     }
+
+    Logger.recordOutput("rollers/goal", goal);
 
     switch (goal) {
       case Stop:

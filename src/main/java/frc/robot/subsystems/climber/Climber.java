@@ -1,6 +1,8 @@
 package frc.robot.subsystems.climber;
 
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -29,29 +31,16 @@ public class Climber extends SubsystemBase {
         }
     }
 
-    public void climberUp() {
-        
-    }
+    //TODO: figure out how on earth the climber will work
 
-    public void climberDown() {
-        
-    }
-
-    public void climberUpOverride() {
-
-    }
-
-    public void stopOverride() {
-
-    }
-
-    public void climberDownOverride() {
-
-    }
+    public void setVoltage(double voltage) {
+        io.setVoltage(voltage);
+    } 
 
     @Override
     public void periodic() {
         io.updateInputs(inputs);
+        Logger.processInputs("Climber", inputs);
 
         //TODO: update global state\
     }

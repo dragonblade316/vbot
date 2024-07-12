@@ -8,7 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import frc.robot.subsystems.drive.DriveConstants;
-import frc.robot.util.Odometry.VSwervePoseEstimator;
+import frc.robot.util.vlib.VSwervePoseEstimator;
 
 public class RobotState {
     private static RobotState instance;

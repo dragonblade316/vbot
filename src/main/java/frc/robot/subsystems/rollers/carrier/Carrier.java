@@ -17,14 +17,11 @@ public class Carrier implements GenericRollers<Carrier.CarrierGoal> {
     private CarrierIO io;
     private SimpleMotorFeedforward feedforward;
     
-    private double setpointRPM = 0;
-    private boolean closedLoopControl = true;
-
     private CarrierGoal goal = CarrierGoal.Stop;
     public enum CarrierGoal implements GenericRollers.Goal {
-        Intake(1),
-        Barf(-1),
-        Shoot(5),
+        Intake(1000),
+        Barf(-300),
+        Shoot(1300),
         Stop(0)
         ;
         private double rpmGoal;
@@ -36,7 +33,7 @@ public class Carrier implements GenericRollers<Carrier.CarrierGoal> {
         }
     }
 
-    private Notifier notifier = new Notifier(null);
+    private Notifier notifier = new Notifier(() -> checkPeriodic());
 
 
     private CarrierIOInputsAutoLogged inputs = new CarrierIOInputsAutoLogged();
@@ -52,8 +49,8 @@ public class Carrier implements GenericRollers<Carrier.CarrierGoal> {
                 
                 break;
             case SIM:
-                feedforward = new SimpleMotorFeedforward(0, 0);
-                io.setPID(1, 0, 0);
+                feedforward = new SimpleMotorFeedforward(0.3, 0.01);
+                io.setPID(0.0001, 0, 0);
                 break;
             default:
                 feedforward = new SimpleMotorFeedforward(0, 0);
@@ -103,7 +100,7 @@ public class Carrier implements GenericRollers<Carrier.CarrierGoal> {
         RobotState.get_instance().containsPiece = inputs.isPiecePresent;
 
         io.setVelocity(goal.getRpmGoal(), feedforward.calculate(goal.getRpmGoal()));
-        Logger.recordOutput("Intake/RPMGoal", goal.getRpmGoal());
+        Logger.recordOutput("Carrier/RPMGoal", goal);
     }
 
     public void checkPeriodic() {

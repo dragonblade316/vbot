@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
 
 public class CarrierIOSim implements CarrierIO {
    //SimDeviceSim sensorSim = new SimDeviceSim("CarrierPieceDetection");
-   DCMotorSim motor = new DCMotorSim(DCMotor.getNEO(1), 1, 0.001);
+   DCMotorSim motor = new DCMotorSim(DCMotor.getNEO(1), 5, 0.001);
    PIDController feedback = new PIDController(0, 0, 0);
 
    boolean closedLoop = false;
@@ -24,6 +24,7 @@ public class CarrierIOSim implements CarrierIO {
 
     @Override
     public void updateInputs(CarrierIOInputs inputs) {
+        motor.update(0.2);
         inputs.isPiecePresent = false; //sensorSim.getBoolean("isPiecePresent").get();
         inputs.appliedVolts = voltage;
         inputs.velocityRPM = motor.getAngularVelocityRPM();

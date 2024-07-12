@@ -1,26 +1,49 @@
 package frc.robot.subsystems.climber;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 
 public class ClimberIOSim implements ClimberIO {
-    DCMotorSim motor;
-    double encoder = 0.0;
+    ElevatorSim motor;
+
+    PIDController pid = new PIDController(0, 0, 0);
+    boolean closedLoopControl = true;
     double voltage = 0.0;
 
 
-
     public ClimberIOSim() {
-        motor = new DCMotorSim(DCMotor.getNEO(1), (double) 75, 0.0001);
+        // motor = new DCMotorSim(DCMotor.getNEO(1), (double) 75, 0.0001);
+        //TODO get Mesurements
+        motor = new ElevatorSim(
+            DCMotor.getNEO(1),
+            75,
+            0.5,
+            0.0254,
+            0.0,
+            1,
+            false,
+            0.0);
     }
 
     @Override
     public void updateInputs(ClimberIOInputs inputs) {
-        inputs.heightFromBaseMeters = motor.getAngularPositionRad();
-        inputs.atLowerLimit = (encoder <= 0);
+        motor.update(0.02);
+
+        inputs.heightFromBaseMeters = motor.getPositionMeters();
+        inputs.atLowerLimit = motor.getPositionMeters() <= 0;
+        inputs.velocityMetersPerSecond = motor.getVelocityMetersPerSecond();
         inputs.appliedVoltage = voltage;
+
+        if (closedLoopControl) {
+            voltage = pid.calculate(motor.getPositionMeters());
+            motor.setInputVoltage(voltage);
+        }
+    }
+
+    @Override
+    public void setPosition(double metersFromBase) {
+        pid.setSetpoint(metersFromBase);
     }
 
     @Override
@@ -31,7 +54,14 @@ public class ClimberIOSim implements ClimberIO {
     }
 
     @Override
+    public void setPID(double kp, double ki, double kd) {
+        pid.setP(kp);
+        pid.setI(ki);
+        pid.setD(kd);
+    }
+
+    @Override
     public void zeroEncoder() {
-        encoder = 0;
+        motor.setState(0, 0);
     }
 }

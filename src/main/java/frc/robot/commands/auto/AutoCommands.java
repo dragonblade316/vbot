@@ -16,12 +16,14 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.RobotState;
 import frc.robot.RobotState.FlywheelState;
 import frc.robot.subsystems.arm.Arm;
-import frc.robot.subsystems.carrier.Carrier;
+import frc.robot.subsystems.rollers.Rollers;
+import frc.robot.subsystems.rollers.Rollers.Goal;
+import frc.robot.subsystems.rollers.carrier.Carrier;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DriveMode;
 import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.gamepieceseeker.GamePieceSeeker;
-import frc.robot.util.FieldUtils;
+import frc.robot.util.vlib.FieldUtils;
 
 public class AutoCommands {
 
@@ -44,15 +46,15 @@ public class AutoCommands {
 
     public Command startShooter(Flywheel flywheel, Arm arm) {
         return new InstantCommand(() -> flywheel.setVelocity(RobotState.AimingFunctions.flywheelSpeed), flywheel)
-            .andThen(new InstantCommand(() -> arm.setPosition(RobotState.AimingFunctions.armAngle), arm));
+            .andThen(new InstantCommand(() -> arm.setGoal(RobotState.AimingFunctions.armAngle), arm));
     }
 
     //heading mode must be set by the auto since this can be run to attempt shoot on the move
-    public Command autoShoot(Drive drive, Flywheel flywheel, Carrier carrier, Arm arm) {
+    public Command autoShoot(Drive drive, Flywheel flywheel, Rollers rollers, Arm arm) {
         var state = RobotState.get_instance();
         return startShooter(flywheel, arm).andThen(new InstantCommand(() -> drive.setHeading(RobotState.AimingFunctions.heading))).andThen(Commands.run(() -> {
             if (state.armInPosition && state.headingAligned && state.shooterFlywheelState == FlywheelState.READY) {
-                carrier.carrierShoot();
+                rollers.setGoal(Goal.Shoot);;
             }
         }).until(() -> state.containsPiece));
     }

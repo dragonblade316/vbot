@@ -7,6 +7,7 @@ public interface ExtenderIO {
     public static class ExtenderIOInputs {
         public double appliedVoltage = 0;
         public double metersExtended = 0;
+        public double velocityMetersPerSecond = 0;
     }
     public default void updateInputs(ExtenderIOInputs inputs) {}
 

@@ -3,6 +3,7 @@ This is a rewrite of the code for team VERN's rebot, Bebop.
 
 Most of this is based on/inspired by team 6328's 2024 robot code and the Advantage kit Advanced swerve template.
 6328 Mechanical Advantage was one of my favorite robots this year and they made a lot of good decisions in their code.
+1690 Orbit were also massive inspirations since they have showed how some of their robot works in varius posts, seminals and a behind the bumpers video.
 
 ## docs:
 Once I have finished I will probably write some simple docs explaining the structure of the project 

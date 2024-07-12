@@ -15,6 +15,7 @@ public class IntakeIOSim implements IntakeIO {
     private double voltage = 0;
     private double ffVoltage = 0;
     private boolean closedLoop = false;
+    
 
     public IntakeIOSim() {
         motor = new DCMotorSim(DCMotor.getNEO(1), 5, 0.001);
@@ -22,7 +23,7 @@ public class IntakeIOSim implements IntakeIO {
 
     public void updateInputs(IntakeIOInputs inputs) {
         motor.update(0.02);
-        inputs.appliedVolts = motor.getOutput(0);
+        inputs.appliedVolts = voltage;
         inputs.velocityRPM = motor.getAngularVelocityRPM();
         inputs.positionRotations = motor.getAngularPositionRotations();
         inputs.currentAmps = motor.getCurrentDrawAmps();
@@ -49,6 +50,7 @@ public class IntakeIOSim implements IntakeIO {
     @Override
     public void setVoltage(double voltage) {
         closedLoop = false;
+        this.voltage = voltage;
         motor.setInputVoltage(voltage);
     }
 }
