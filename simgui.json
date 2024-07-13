@@ -1,6 +1,7 @@
 {
   "NTProvider": {
     "types": {
+      "/AdvantageKit/RealOutputs/Arm/MechState": "Mechanism2d",
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Auto Choices": "String Chooser",
       "/SmartDashboard/Driver": "String Chooser"

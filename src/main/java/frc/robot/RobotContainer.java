@@ -19,19 +19,29 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.estimator.ExtendedKalmanFilter;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmIO;
 import frc.robot.subsystems.arm.ArmIOSim;
 import frc.robot.subsystems.arm.ArmIOSparkMax;
 import frc.robot.subsystems.arm.Arm.SetGoal;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.GyroIO;
+import frc.robot.subsystems.drive.GyroIOPigeon2;
+import frc.robot.subsystems.drive.ModuleIO;
+import frc.robot.subsystems.drive.ModuleIOSim;
+import frc.robot.subsystems.drive.ModuleIOSparkMax;
+import frc.robot.subsystems.drive.Drive.DriveMode;
 import frc.robot.subsystems.extender.Extender;
 import frc.robot.subsystems.extender.ExtenderIO;
 import frc.robot.subsystems.extender.ExtenderIOSim;
@@ -59,7 +69,7 @@ import frc.robot.subsystems.rollers.intake.IntakeIOSparkMax;
  */
 public class RobotContainer {
   // Subsystems
-  //private final Drive drive;
+  private final Drive drive;
   private final Flywheel flywheel;
   private final Arm arm;
     // private final Climber climber;
@@ -77,9 +87,9 @@ public class RobotContainer {
   private final Joystick buttonPanel = new Joystick(2);
 
   JoystickButton intakeButton;
-  JoystickButton fireButton;
-  JoystickButton autoAimButton;
+  JoystickButton smartFireButton;
   JoystickButton autoAmpButton;
+  
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -93,13 +103,13 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
-        // drive =
-        //     new Drive(
-        //         new GyroIOPigeon2(false),
-        //         new ModuleIOSparkMax(0),
-        //         new ModuleIOSparkMax(1),
-        //         new ModuleIOSparkMax(2),
-        //         new ModuleIOSparkMax(3));
+        drive =
+            new Drive(
+                new GyroIOPigeon2(false),
+                new ModuleIOSparkMax(0),
+                new ModuleIOSparkMax(1),
+                new ModuleIOSparkMax(2),
+                new ModuleIOSparkMax(3));
         flywheel = new Flywheel(new FlywheelIOSparkMax());
         arm = new Arm(new ArmIOSparkMax());
         extender = new Extender(new ExtenderIOSparkMax());
@@ -109,13 +119,13 @@ public class RobotContainer {
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
-        // drive =
-        //     new Drive(
-        //         new GyroIO() {},
-        //         new ModuleIOSim(),
-        //         new ModuleIOSim(),
-        //         new ModuleIOSim(),
-        //         new ModuleIOSim());
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim());
         flywheel = new Flywheel(new FlywheelIOSim());
         arm = new Arm(new ArmIOSim());
         extender = new Extender(new ExtenderIOSim());
@@ -125,13 +135,13 @@ public class RobotContainer {
 
       default:
         // Replayed robot, disable IOdawd implementations
-        // drive =
-        //     new Drive(
-        //         new GyroIO() {},
-        //         new ModuleIO() {},
-        //         new ModuleIO() {},
-        //         new ModuleIO() {},
-        //         new ModuleIO() {});
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {});
         flywheel = new Flywheel(new FlywheelIO() {});
         arm = new Arm(new ArmIO() {});
         extender = new Extender(new ExtenderIO() {});
@@ -215,20 +225,14 @@ public class RobotContainer {
     //set per driver bindings here later
     defaultDriverBindings();
     
-    
-    intakeButton.whileTrue(Commands.startEnd(() -> rollers.setGoal(Goal.Intake), () -> rollers.setGoal(Goal.Stop), rollers));
-    autoAmpButton.whileTrue(Commands.startEnd(() -> extender.setGoal(frc.robot.subsystems.extender.Extender.Goal.AMP), () -> extender.setGoal(frc.robot.subsystems.extender.Extender.Goal.RETRACTED), extender));
-    fireButton.whileTrue(Commands.startEnd(() -> arm.setGoal(SetGoal.SPEAKER_DEAD_REKON), () -> arm.setGoal(SetGoal.TRAVERSE), arm));
-    //button.whileTrue(Commands.startEnd(() -> flywheel.runVelocity(10), () -> flywheel.runVelocity(10), flywheel));
-    var con = new PathConstraints(5, 3, 720, 260);
-    //button.whileTrue(AutoBuilder.pathfindToPose(new Pose2d(10.0, 10.0, Rotation2d.fromDegrees(0)), con));
-    
-    // drive.setDefaultCommand(
-    //     new RunCommand(
-    //         () -> drive.updateTeleopInputs(rjoy.getY(), rjoy.getX(), -ljoy.getX()), 
-    //         drive
-    //     )
-    // );
+    drive.setDefaultCommand(
+        new RunCommand(
+            () -> drive.updateTeleopInputs(rjoy.getY(), rjoy.getX(), -ljoy.getX()), 
+            drive
+        )
+    );
+
+    autoAmpButton.whileTrue(drive.setHeadingCommand(() -> Rotation2d.fromDegrees(90)).alongWith(arm.));
 
     //button.whileTrue(Commands.startEnd(() -> drive.setHeading(() -> Rotation2d.fromDegrees(90)), () -> drive.clearHeading()));
     //this may be useful later but idk
@@ -262,11 +266,11 @@ public class RobotContainer {
   private void defaultDriverBindings() {
     intakeButton = new JoystickButton(rjoy, 1);
     autoAmpButton = new JoystickButton(rjoy, 2);
-    fireButton = new JoystickButton(rjoy, 3);
+    // fireButton = new JoystickButton(rjoy, 3);
   }
 
   private void simDriverBindings() {
-    intakeButton = new JoystickButton(rjoy, 1);
+    intakeButton = new JoystickButton(ljoy, 1);
   }
 
 
@@ -281,10 +285,10 @@ public class RobotContainer {
 
   //init functions, called by Robot.java
   public void auto() {
-    //drive.setMode(DriveMode.Auto);
+    drive.setMode(DriveMode.Auto);
   }
 
   public void teleop() {
-    //drive.setMode(DriveMode.Teleop);
+    drive.setMode(DriveMode.Teleop);
   }
 }

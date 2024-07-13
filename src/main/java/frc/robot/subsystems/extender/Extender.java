@@ -4,6 +4,8 @@ package frc.robot.subsystems.extender;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -36,7 +38,6 @@ public class Extender extends SubsystemBase {
             case SIM:
                 io.setPID(3.5, 0, 0);
                 break;
-        
             default:
                 break;
         }
@@ -55,6 +56,10 @@ public class Extender extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Extender", inputs);
+    }
+
+    public Command setGoalCommand(Goal goal) {
+        return Commands.startEnd(() -> this.setGoal(goal), () -> this.setGoal(Goal.RETRACTED), this);
     }
 }
 

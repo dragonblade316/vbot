@@ -11,6 +11,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotState;
@@ -35,6 +42,11 @@ public class Arm extends SubsystemBase {
 
     private boolean climblock = false;
 
+    Mechanism2d mech = new Mechanism2d(3, 3);
+    MechanismRoot2d root = mech.getRoot("arm", 1, 0);
+    MechanismLigament2d actual = new MechanismLigament2d("armCurrent", 0.5, 0, 6, new Color8Bit(Color.kRed));
+    MechanismLigament2d target = new MechanismLigament2d("armTarget", 0.5, 0, 6, new Color8Bit(Color.kBlue));
+
     //all of these are in degrees, they will be converted to rads
     public enum SetGoal {
         TRAVERSE(17),
@@ -53,6 +65,9 @@ public class Arm extends SubsystemBase {
     public Arm(ArmIO io) {
         this.io = io;
 
+        root.append(actual);
+        root.append(target);
+
         switch (Constants.currentMode) {
             case REAL:
                 feedforward = new VArmFeedforward(0, 0, 0);
@@ -65,8 +80,8 @@ public class Arm extends SubsystemBase {
 
             default:
                 //these guessed values are good enough for now but may need more tuning in the future
-                feedforward = new VArmFeedforward(3, 0, 3);
-                feedback = new PIDController(2, 0, 0);
+                feedforward = new VArmFeedforward(0, 0, 0);
+                feedback = new PIDController(4, 0, 0);
                 break;
         }
 
@@ -105,6 +120,16 @@ public class Arm extends SubsystemBase {
 
         //TODO: I should probably add in safety limits or smtn but whatever
         io.setVoltage(feedback.calculate(inputs.angle.getRadians(), targetAngle.get().getRadians()) + feedforward.calculate(setpointState.position, setpointState.velocity));
+
+        //visualization update
+
+        actual.setAngle(inputs.angle);
+        target.setAngle(targetAngle.get());
+        Logger.recordOutput("Arm/MechState", mech);
+    }
+
+    public Command setGoalCommand() {
+        Commands.startEnd(() -> set, null, null)
     }
 }
 

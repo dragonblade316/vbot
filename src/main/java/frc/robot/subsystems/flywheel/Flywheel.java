@@ -59,6 +59,7 @@ public class Flywheel extends SubsystemBase {
     }
 
     // Configure SysId
+    //TODO: change the ramp rate so it does not wreak the flywheels
     sysId =
         new SysIdRoutine(
             new SysIdRoutine.Config(
@@ -75,7 +76,7 @@ public class Flywheel extends SubsystemBase {
     Logger.processInputs("Flywheel", inputs);
 
 
-    // Log flywheel setpoint
+    // Log flywheel setpoin to one of the labelet
     Logger.recordOutput("Flywheel/SetpointRPM", velocityRPM.getAsDouble());
     var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM.getAsDouble());
     io.setVelocity(velocityRadPerSec, ffModel.calculate(velocityRadPerSec));

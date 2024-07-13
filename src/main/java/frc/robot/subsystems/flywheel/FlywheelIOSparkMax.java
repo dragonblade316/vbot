@@ -30,7 +30,6 @@ import edu.wpi.first.math.util.Units;
  */
 public class FlywheelIOSparkMax implements FlywheelIO {
   private static final double GEAR_RATIO = 1;
-  private static final double MAX_VOLTAGE = 9;
 
   private final CANSparkMax leader = new CANSparkMax(10, MotorType.kBrushless);
   private final CANSparkMax follower = new CANSparkMax(14, MotorType.kBrushless);
