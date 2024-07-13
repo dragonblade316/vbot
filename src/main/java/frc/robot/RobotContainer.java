@@ -232,7 +232,7 @@ public class RobotContainer {
         )
     );
 
-    autoAmpButton.whileTrue(drive.setHeadingCommand(() -> Rotation2d.fromDegrees(90)).alongWith(arm.));
+    autoAmpButton.whileTrue(drive.setHeadingCommand(() -> Rotation2d.fromDegrees(90)).alongWith(arm.setGoalCommand(Arm.SetGoal.AMP)));
 
     //button.whileTrue(Commands.startEnd(() -> drive.setHeading(() -> Rotation2d.fromDegrees(90)), () -> drive.clearHeading()));
     //this may be useful later but idk

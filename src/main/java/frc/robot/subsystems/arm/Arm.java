@@ -128,8 +128,12 @@ public class Arm extends SubsystemBase {
         Logger.recordOutput("Arm/MechState", mech);
     }
 
-    public Command setGoalCommand() {
-        Commands.startEnd(() -> set, null, null)
+    public Command setGoalCommand(SetGoal goal) {
+        return Commands.startEnd(() -> setGoal(goal), () -> setGoal(SetGoal.TRAVERSE), this);
+    }
+
+    public Command setGoalCommand(Supplier<Rotation2d> angle) {
+        return Commands.startEnd(() -> setGoal(angle), () -> setGoal(SetGoal.TRAVERSE), this);
     }
 }
 
