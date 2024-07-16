@@ -108,12 +108,16 @@ public class RobotContainer {
         drive =
             new Drive(
                 new GyroIOPigeon2(false),
-                new ModuleIOSparkMax(0),
-                new ModuleIOSparkMax(1),
-                new ModuleIOSparkMax(2),
-                new ModuleIOSparkMax(3));
+                // new ModuleIOSparkMax(0),
+                // new ModuleIOSparkMax(1),
+                // new ModuleIOSparkMax(2),
+                // new ModuleIOSparkMax(3))
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {});
         flywheel = new Flywheel(new FlywheelIOSparkMax());
-        arm = new Arm(new ArmIOSparkMax());
+        arm = new Arm(new ArmIO() {});
         extender = new Extender(new ExtenderIOSparkMax());
         intake = new Intake(new IntakeIOSparkMax());
         carrier = new Carrier(new CarrierIOSparkMax());
