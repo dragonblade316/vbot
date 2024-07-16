@@ -7,6 +7,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.util.vlib.VSwervePoseEstimator;
 
@@ -41,6 +43,12 @@ public class RobotState {
         public static DoubleSupplier flywheelSpeed = () -> 0;
     }
 
+    public static record LobbingFunctions() {
+        public static Supplier<Rotation2d> armAngle = () -> Rotation2d.fromDegrees(20);
+        public static Supplier<Rotation2d> heading = () -> Rotation2d.fromDegrees(0);
+        public static DoubleSupplier flywheelSpeed = () -> 0;
+    }
+
     //drive base: (these will be completely removed in favor of the VSwervePoseEstimator)
     // public Pose2d robotPose = new Pose2d();
     // public Twist2d translationVelocity = new Twist2d();
@@ -55,6 +63,15 @@ public class RobotState {
     //shooter:
 
     //might move this to the shooter subsystem
+    public enum SmartFireMode {
+        Standard, //handles lobbing and speaker depending on the position of the robot
+        AMPTRAP, //handles the amp and trap fire mode
+    }
+    public SmartFireMode smartFireMode = SmartFireMode.Standard;
+    public Command AmpTrapModeCommand() {
+        return Commands.startEnd(() -> smartFireMode = SmartFireMode.AMPTRAP, () -> smartFireMode = SmartFireMode.Standard);
+    }
+
     public enum FlywheelState {
         READY,
         ACCELERATING,

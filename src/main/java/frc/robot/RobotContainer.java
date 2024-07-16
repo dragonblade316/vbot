@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -60,6 +61,7 @@ import frc.robot.subsystems.rollers.intake.Intake;
 import frc.robot.subsystems.rollers.intake.IntakeIO;
 import frc.robot.subsystems.rollers.intake.IntakeIOSim;
 import frc.robot.subsystems.rollers.intake.IntakeIOSparkMax;
+import frc.robot.util.vlib.FieldUtils;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -187,24 +189,6 @@ public class RobotContainer {
     autoChooser.addOption(
         "Flywheel SysId (Dynamic Reverse)", flywheel.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    //these are useless now but I dont feel like deleting them yet
-    // autoChooser.addOption(
-    //     "Intake SysId (Quasistatic forward)", intake.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    // autoChooser.addOption(
-    //     "Intake SysId (Quasistatic reverse)", intake.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    // autoChooser.addOption(
-    //     "Intake SysId (Dynamic Forward)", intake.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    // autoChooser.addOption(
-    //     "Intake SysId (Dynamic Reverse)", intake.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    // autoChooser.addOption(
-    //     "Carrier SysId (Quasistatic forward)", carrier.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    // autoChooser.addOption(
-    //     "Carrier SysId (Quasistatic reverse)", carrier.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    // autoChooser.addOption(
-    //     "Carrier SysId (Dynamic Forward)", carrier.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    // autoChooser.addOption(
-    //     "Carrier SysId (Dynamic Reverse)", carrier.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
     autoChooser.addOption(
         "Rollers SysID", rollers.sysIdCommand());
 
@@ -232,11 +216,19 @@ public class RobotContainer {
         )
     );
 
-    autoAmpButton.whileTrue(drive.setHeadingCommand(() -> Rotation2d.fromDegrees(90)).alongWith(arm.setGoalCommand(Arm.SetGoal.AMP)));
+    autoAmpButton.whileTrue(drive.setHeadingCommand(() -> FieldUtils.apply(Rotation2d.fromDegrees(90))).alongWith(arm.setGoalCommand(Arm.SetGoal.AMP)).alongWith(RobotState.get_instance().AmpTrapModeCommand()));
+    smartFireButton.whileTrue(
+      Commands.either(
+        drive.setHeadingCommand(RobotState.AimingFunctions.heading)
+        .alongWith(arm.setGoalCommand(RobotState.AimingFunctions.armAngle))
+        .alongWith(flywheel.setVelocityCommand(RobotState.AimingFunctions.flywheelSpeed))
+        ,
+        
+        Commands.none(), 
+        
+        () -> RobotState.get_instance().smartFireMode == RobotState.SmartFireMode.Standard));
+    
 
-    //button.whileTrue(Commands.startEnd(() -> drive.setHeading(() -> Rotation2d.fromDegrees(90)), () -> drive.clearHeading()));
-    //this may be useful later but idk
-//    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
   }
 
   private enum Driver {
@@ -266,7 +258,7 @@ public class RobotContainer {
   private void defaultDriverBindings() {
     intakeButton = new JoystickButton(rjoy, 1);
     autoAmpButton = new JoystickButton(rjoy, 2);
-    // fireButton = new JoystickButton(rjoy, 3);
+    smartFireButton = new JoystickButton(rjoy, 3);
   }
 
   private void simDriverBindings() {

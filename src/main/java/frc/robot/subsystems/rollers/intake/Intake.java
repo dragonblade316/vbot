@@ -2,17 +2,18 @@ package frc.robot.subsystems.rollers.intake;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Queue;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
-import frc.robot.subsystems.rollers.Rollers;
-import frc.robot.subsystems.rollers.intake.IntakeIO;
 import frc.robot.subsystems.rollers.GenericRollers;
+import frc.robot.subsystems.rollers.Rollers;
+import frc.robot.util.misc.ArrayCircularQueue;
 
 public class Intake implements GenericRollers<Intake.IntakeGoal> {
     private IntakeIO io;
@@ -25,6 +26,7 @@ public class Intake implements GenericRollers<Intake.IntakeGoal> {
 
     //I just had this thought earlier today. By monitoring current/voltage spikes we may be able to detect when the intake jams and automatically attempt to fix it
     private boolean isjammed = false;
+    private ArrayCircularQueue<Double> currentBuffer = new ArrayCircularQueue<Double>(10);
 
     public IntakeGoal goal = IntakeGoal.Stop;
     public enum IntakeGoal implements GenericRollers.Goal {
@@ -103,6 +105,9 @@ public class Intake implements GenericRollers<Intake.IntakeGoal> {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Intake", inputs);
+
+        for(int i : currentBuffer)
+        if 
 
         io.setVelocity(goal.getRpmGoal(), feedforward.calculate(goal.getRpmGoal()));
         

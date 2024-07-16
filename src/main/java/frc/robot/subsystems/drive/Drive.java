@@ -281,7 +281,12 @@ public class Drive extends SubsystemBase {
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
+
+    //velocity limit
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, DriveConstants.MAX_LINEAR_SPEED);
+
+    //accel limit (im stealing orbits accel limits for the time being)
+    //ChassisSpeeds wantedAcc = speeds.minus(kinematics.toChassisSpeeds(getModuleStates()))
 
     // Send setpoints to modules
     SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
@@ -386,6 +391,6 @@ public class Drive extends SubsystemBase {
   }
 
   public Command setHeadingCommand(Supplier<Rotation2d> heading) {
-    return Commands.startEnd(() -> setHeading(heading), () -> clearHeading(), this);
+    return Commands.startEnd(() -> setHeading(heading), () -> clearHeading());
   }
 }
