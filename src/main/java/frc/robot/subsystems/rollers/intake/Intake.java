@@ -106,8 +106,19 @@ public class Intake implements GenericRollers<Intake.IntakeGoal> {
         io.updateInputs(inputs);
         Logger.processInputs("Intake", inputs);
 
-        for(int i : currentBuffer)
-        if 
+
+        //<jam detection>
+        currentBuffer.enQueue(inputs.currentAmps);
+        double avg = 0;
+        for(int i = 0; i < 10; i++) {
+            avg = avg + currentBuffer.get(i);
+        }
+        avg = avg / 10;
+        if (avg < 60) {
+            isjammed = true;
+        }
+        Logger.recordOutput("Intake/IsJammed", isjammed);
+        //</jam detection>
 
         io.setVelocity(goal.getRpmGoal(), feedforward.calculate(goal.getRpmGoal()));
         

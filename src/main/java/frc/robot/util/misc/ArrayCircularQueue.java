@@ -1,6 +1,7 @@
 package frc.robot.util.misc;
 
 import java.util.ArrayList;
+import java.util.EmptyStackException;
 
 //copied from here bc I'm lazy and dont like writing data structures: https://www.geeksforgeeks.org/introduction-to-circular-queue/
 public class ArrayCircularQueue<E> {
@@ -8,7 +9,7 @@ public class ArrayCircularQueue<E> {
     private int size, front, rear;
     
     // Declaring array list of integer type.
-    private ArrayList<Integer> queue = new ArrayList<Integer>();
+    private ArrayList<E> queue = new ArrayList<>();
     
     // Constructor
     public ArrayCircularQueue(int size)
@@ -18,7 +19,7 @@ public class ArrayCircularQueue<E> {
     }
     
     // Method to insert a new element in the queue.
-    public void enQueue(int data)
+    public void enQueue(E data)
     {
         
         // Condition if queue is full.
@@ -62,9 +63,9 @@ public class ArrayCircularQueue<E> {
     
     // Function to dequeue an element
     // form th queue.
-    public int deQueue()
+    public E deQueue()
     {
-        int temp;
+        E temp;
     
         // Condition for empty queue.
         if(front == -1)
@@ -72,7 +73,8 @@ public class ArrayCircularQueue<E> {
             System.out.print("Queue is Empty");
             
             // Return -1 in case of empty queue
-            return -1; 
+            //I dont think this is the right exception but it should work
+            throw new EmptyStackException(); 
         }
     
         temp = queue.get(front);
@@ -97,8 +99,8 @@ public class ArrayCircularQueue<E> {
         return temp;
     }
 
-    public void get(int index) {
-        queue.get(index);
+    public E get(int index) {
+        return queue.get(index);
     }
     
     

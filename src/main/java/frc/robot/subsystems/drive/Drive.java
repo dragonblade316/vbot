@@ -285,6 +285,7 @@ public class Drive extends SubsystemBase {
     //velocity limit
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, DriveConstants.MAX_LINEAR_SPEED);
 
+    //TODO: figure out the acceleration limits. 
     //accel limit (im stealing orbits accel limits for the time being)
     //ChassisSpeeds wantedAcc = speeds.minus(kinematics.toChassisSpeeds(getModuleStates()))
 
