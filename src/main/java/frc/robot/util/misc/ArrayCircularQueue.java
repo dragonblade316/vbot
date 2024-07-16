@@ -3,7 +3,7 @@ package frc.robot.util.misc;
 import java.util.ArrayList;
 
 //copied from here bc I'm lazy and dont like writing data structures: https://www.geeksforgeeks.org/introduction-to-circular-queue/
-public class ArrayCircularQueue<E> implements Iterable<E> {
+public class ArrayCircularQueue<E> {
     // Declaring the class variables.
     private int size, front, rear;
     
@@ -95,6 +95,10 @@ public class ArrayCircularQueue<E> implements Iterable<E> {
         
         // Returns the dequeued element
         return temp;
+    }
+
+    public void get(int index) {
+        queue.get(index);
     }
     
     
