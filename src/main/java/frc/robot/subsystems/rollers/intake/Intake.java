@@ -26,7 +26,7 @@ public class Intake implements GenericRollers<Intake.IntakeGoal> {
 
     //I just had this thought earlier today. By monitoring current/voltage spikes we may be able to detect when the intake jams and automatically attempt to fix it
     private boolean isjammed = false;
-    private ArrayCircularQueue<Double> currentBuffer = new ArrayCircularQueue<Double>(10);
+    private ArrayCircularQueue<Double> currentBuffer = new ArrayCircularQueue<Double>(10, 0.0);
 
     public IntakeGoal goal = IntakeGoal.Stop;
     public enum IntakeGoal implements GenericRollers.Goal {

@@ -280,14 +280,18 @@ public class Drive extends SubsystemBase {
 
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
+
+    //TODO: figure out the acceleration limits. 
+    //accel limit (im stealing orbits accel limits for the time being)
+    ChassisSpeeds wantedAcc = speeds.minus(kinematics.toChassisSpeeds(getModuleStates()));
+    //wantedAcc = new ChassisSpeeds(DriveConstants.MAX_FORWARD_ACC, DriveConstants.MAX_FORWARD_ACC, DriveConstants.MAX_FORWARD_ACC / DriveConstants.DRIVE_BASE_RADIUS).times(1-kinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond- DriveConstants.MAX_LINEAR_SPEED);
+    
+
+
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
 
     //velocity limit
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, DriveConstants.MAX_LINEAR_SPEED);
-
-    //TODO: figure out the acceleration limits. 
-    //accel limit (im stealing orbits accel limits for the time being)
-    //ChassisSpeeds wantedAcc = speeds.minus(kinematics.toChassisSpeeds(getModuleStates()))
 
     // Send setpoints to modules
     SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];

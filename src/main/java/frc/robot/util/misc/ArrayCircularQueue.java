@@ -12,10 +12,14 @@ public class ArrayCircularQueue<E> {
     private ArrayList<E> queue = new ArrayList<>();
     
     // Constructor
-    public ArrayCircularQueue(int size)
+    public ArrayCircularQueue(int size, E defaultValue)
     {
         this.size = size;
         this.front = this.rear = -1;
+
+        for (int i = 0; i < size; i++) {
+            queue.add(i, defaultValue);
+        }
     }
     
     // Method to insert a new element in the queue.

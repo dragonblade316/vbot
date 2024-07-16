@@ -7,6 +7,7 @@ package frc.robot.subsystems.rollers;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.RobotState;
@@ -55,6 +56,10 @@ public class Rollers extends SubsystemBase {
   public void setGoal(Goal goal) {
     Logger.recordOutput("rollers/goal", goal);
     this.goal = goal;
+  }
+
+  public Command setGoalCommand(Goal goal) {
+    return Commands.startEnd(() -> setGoal(goal), () -> setGoal(Goal.Stop), this);
   }
 
   @Override

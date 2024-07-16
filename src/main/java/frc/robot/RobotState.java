@@ -40,7 +40,7 @@ public class RobotState {
     public static record AimingFunctions() {
         public static Supplier<Rotation2d> armAngle = () -> Rotation2d.fromDegrees(20);
         public static Supplier<Rotation2d> heading = () -> Rotation2d.fromDegrees(0);
-        public static DoubleSupplier flywheelSpeed = () -> 0;
+        public static DoubleSupplier flywheelSpeed = () -> 2500;
     }
 
     public static record LobbingFunctions() {
