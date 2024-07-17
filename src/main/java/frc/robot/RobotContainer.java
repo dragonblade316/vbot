@@ -91,6 +91,11 @@ public class RobotContainer {
   JoystickButton intakeButton;
   JoystickButton smartFireButton;
   JoystickButton autoAmpButton;
+
+  JoystickButton temp1;
+  JoystickButton temp2;
+  JoystickButton temp3;
+  
   
 
   // Dashboard inputs
@@ -117,8 +122,8 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         flywheel = new Flywheel(new FlywheelIOSparkMax());
-        arm = new Arm(new ArmIO() {});
-        extender = new Extender(new ExtenderIOSparkMax());
+        arm = new Arm(new ArmIOSparkMax());
+        extender = new Extender(new ExtenderIO() {});
         intake = new Intake(new IntakeIOSparkMax());
         carrier = new Carrier(new CarrierIOSparkMax());
         break;
@@ -182,17 +187,19 @@ public class RobotContainer {
     //     "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     // autoChooser.addOption(
     //     "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Flywheel SysId (Quasistatic Forward)",
-        flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Flywheel SysId (Quasistatic Reverse)",
-        flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Flywheel SysId (Dynamic Forward)", flywheel.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Flywheel SysId (Dynamic Reverse)", flywheel.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // autoChooser.addOption(
+    //     "Flywheel SysId (Quasistatic Forward)",
+    //     flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    // autoChooser.addOption(
+    //     "Flywheel SysId (Quasistatic Reverse)",
+    //     flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    // autoChooser.addOption(
+    //     "Flywheel SysId (Dynamic Forward)", flywheel.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // autoChooser.addOption(
+    //     "Flywheel SysId (Dynamic Reverse)", flywheel.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
+    autoChooser.addOption(
+        "Flywheel SysId", flywheel.sysidCommand());
     autoChooser.addOption(
         "Rollers SysID", rollers.sysIdCommand());
 
@@ -232,6 +239,8 @@ public class RobotContainer {
         Commands.none(), 
         
         () -> RobotState.get_instance().smartFireMode == RobotState.SmartFireMode.Standard));
+
+    temp1.whileTrue(arm.setGoalCommand(Arm.SetGoal.SPEAKER_DEAD_REKON));
     
 
   }
@@ -264,6 +273,8 @@ public class RobotContainer {
     intakeButton = new JoystickButton(rjoy, 1);
     autoAmpButton = new JoystickButton(rjoy, 2);
     smartFireButton = new JoystickButton(rjoy, 3);
+
+    temp1 = new JoystickButton(ljoy, 1);
   }
 
   private void simDriverBindings() {

@@ -37,7 +37,7 @@ public class FlywheelIOSim implements FlywheelIO {
 
     sim.update(0.02);
 
-    inputs.positionRad = 0;
+    inputs.positionRotations = 0;
     inputs.velocityRPM = sim.getAngularVelocityRPM();
     inputs.appliedVolts = appliedVolts;
     inputs.currentAmps = new double[] {sim.getCurrentDrawAmps()};

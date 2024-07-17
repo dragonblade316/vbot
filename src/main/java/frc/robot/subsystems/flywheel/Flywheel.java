@@ -13,7 +13,9 @@
 
 package frc.robot.subsystems.flywheel;
 
+import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.VoltsPerMeterPerSecond;
 
 import java.util.function.DoubleSupplier;
 
@@ -23,9 +25,12 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants;
 
 public class Flywheel extends SubsystemBase {
@@ -67,7 +72,7 @@ public class Flywheel extends SubsystemBase {
     sysId =
         new SysIdRoutine(
             new SysIdRoutine.Config(
-                null,
+                Volts.per(Second).of(0.5),
                 null,
                 null,
                 (state) -> Logger.recordOutput("Flywheel/SysIdState", state.toString())),
@@ -83,7 +88,6 @@ public class Flywheel extends SubsystemBase {
     // Log flywheel setpoin to one of the labelet
     Logger.recordOutput("Flywheel/SetpointRPM", velocityRPM.getAsDouble());
 
-    System.out.println("ffmodel: " + ffModel.calculate(velocityRPM.getAsDouble()));
     io.setVelocity(velocityRPM.getAsDouble(), ffModel.calculate(velocityRPM.getAsDouble()));
   }
 
@@ -114,6 +118,17 @@ public class Flywheel extends SubsystemBase {
   /** Returns a command to run a dynamic test in the specified direction. */
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
     return sysId.dynamic(direction);
+  }
+
+  public Command sysidCommand() {
+    return sysId.quasistatic(Direction.kForward).andThen(
+      Commands.waitSeconds(1),
+      sysId.quasistatic(Direction.kReverse),
+      Commands.waitSeconds(1),
+      sysId.dynamic(Direction.kForward),
+      Commands.waitSeconds(1),
+      sysId.dynamic(Direction.kReverse)
+    );
   }
 
   /** Returns the current velocity in RPM. */

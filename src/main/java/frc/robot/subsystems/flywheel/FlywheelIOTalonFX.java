@@ -57,7 +57,7 @@ public class FlywheelIOTalonFX implements FlywheelIO {
   public void updateInputs(FlywheelIOInputs inputs) {
     BaseStatusSignal.refreshAll(
         leaderPosition, leaderVelocity, leaderAppliedVolts, leaderCurrent, followerCurrent);
-    inputs.positionRad = Units.rotationsToRadians(leaderPosition.getValueAsDouble()) / GEAR_RATIO;
+    inputs.positionRotations = leaderPosition.getValueAsDouble() / GEAR_RATIO;
     inputs.velocityRPM= (leaderVelocity.getValueAsDouble()) / GEAR_RATIO;
     inputs.appliedVolts = leaderAppliedVolts.getValueAsDouble();
     inputs.currentAmps =

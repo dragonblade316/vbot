@@ -30,7 +30,7 @@ public class Intake implements GenericRollers<Intake.IntakeGoal> {
 
     public IntakeGoal goal = IntakeGoal.Stop;
     public enum IntakeGoal implements GenericRollers.Goal {
-        Intake(1000),
+        Intake(600),
         Barf(-600),
         Stop(0)
         ;

@@ -42,12 +42,19 @@ public class Rollers extends SubsystemBase {
     var CR = carrier.getSysIdRoutine(this);
 
     return IR.quasistatic(Direction.kForward).andThen(
+      Commands.waitSeconds(1),
       IR.quasistatic(Direction.kReverse),
+      Commands.waitSeconds(1),
       IR.dynamic(Direction.kForward),
+      Commands.waitSeconds(1),
       IR.dynamic(Direction.kReverse),
+      Commands.waitSeconds(1),
       CR.quasistatic(Direction.kForward),
+      Commands.waitSeconds(1),
       CR.quasistatic(Direction.kReverse),
+      Commands.waitSeconds(1),
       CR.dynamic(Direction.kForward),
+      Commands.waitSeconds(1),
       CR.dynamic(Direction.kReverse)
 
     );

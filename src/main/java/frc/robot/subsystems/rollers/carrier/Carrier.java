@@ -19,7 +19,7 @@ public class Carrier implements GenericRollers<Carrier.CarrierGoal> {
     
     private CarrierGoal goal = CarrierGoal.Stop;
     public enum CarrierGoal implements GenericRollers.Goal {
-        Intake(1000),
+        Intake(600),
         Barf(-300),
         Shoot(1300),
         Stop(0)
@@ -104,6 +104,7 @@ public class Carrier implements GenericRollers<Carrier.CarrierGoal> {
     }
 
     public void checkPeriodic() {
+        //io.updateInputs(inputs);
         if (goal == CarrierGoal.Intake && inputs.isPiecePresent) {
             goal = CarrierGoal.Stop;
             periodic();

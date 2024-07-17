@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -70,7 +71,7 @@ public class Arm extends SubsystemBase {
 
         switch (Constants.currentMode) {
             case REAL:
-                feedforward = new VArmFeedforward(0, 0, 0);
+                feedforward = new VArmFeedforward(0, 0.1, 0);
                 feedback = new PIDController(0, 0, 0);
                 break;
             
@@ -86,7 +87,7 @@ public class Arm extends SubsystemBase {
         }
 
         io.updateInputs(inputs);
-        setPointState = new TrapezoidProfile.State(inputs.angle.getRadians(), inputs.velocityRadPerSec);
+        setPointState = new TrapezoidProfile.State(inputs.angle.getRadians(), 0);
     }
 
     public void setGoal(Supplier<Rotation2d> angle) {
@@ -108,6 +109,7 @@ public class Arm extends SubsystemBase {
             targetAngle = () -> Rotation2d.fromDegrees(SetGoal.CLIMB.angle);
         }
 
+        
         var setpointState = profile.calculate(
             0.02, 
             setPointState, new TrapezoidProfile.State(
@@ -118,8 +120,10 @@ public class Arm extends SubsystemBase {
             0.0));
 
 
+        //System.out.println(setpointState.position + " " + setpointState.velocity);
+
         //TODO: I should probably add in safety limits or smtn but whatever
-        io.setVoltage(feedback.calculate(inputs.angle.getRadians(), targetAngle.get().getRadians()) + feedforward.calculate(setpointState.position, setpointState.velocity));
+        io.setVoltage(feedback.calculate(inputs.angle.getRadians(), targetAngle.get().getRadians()) + feedforward.calculate(inputs.angle.getRadians(), 0));
 
         //visualization update
 

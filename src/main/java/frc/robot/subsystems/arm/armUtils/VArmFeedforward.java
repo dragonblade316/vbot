@@ -1,5 +1,7 @@
 package frc.robot.subsystems.arm.armUtils;
 
+import edu.wpi.first.math.util.Units;
+
 public class VArmFeedforward {
     /** The static gain, in volts. */
     public final double ks;
@@ -66,9 +68,9 @@ public class VArmFeedforward {
     public double calculate(
         double positionRadians, double velocityRadPerSec, double accelRadPerSecSquared) {
 
-        double g = Math.cos(positionRadians - Math.PI/2);
+        double g = Math.cos(positionRadians - Units.degreesToRadians(45));
 
-        if (positionRadians < Math.PI/2) {
+        if (positionRadians < Units.degreesToRadians(45)) {
             g = 0;
         }
 

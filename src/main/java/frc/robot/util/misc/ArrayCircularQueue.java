@@ -30,7 +30,7 @@ public class ArrayCircularQueue<E> {
         if((front == 0 && rear == size - 1) ||
         (rear == (front - 1) % (size - 1)))
         {
-            System.out.print("Queue is Full");
+            //System.out.print("Queue is Full");
         }
     
         // condition for empty queue.
