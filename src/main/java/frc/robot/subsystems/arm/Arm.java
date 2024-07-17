@@ -6,7 +6,6 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -81,8 +80,9 @@ public class Arm extends SubsystemBase {
 
             default:
                 //these guessed values are good enough for now but may need more tuning in the future
-                feedforward = new VArmFeedforward(0, 0, 0);
-                feedback = new PIDController(4, 0, 0);
+                feedforward = new VArmFeedforward(0.1, 0, 0);
+                feedback = new PIDController(0, 0, 0);
+                // feedback = new PIDController(4, 0, 0);
                 break;
         }
 
@@ -112,7 +112,11 @@ public class Arm extends SubsystemBase {
         
         var setpointState = profile.calculate(
             0.02, 
-            setPointState, new TrapezoidProfile.State(
+            new TrapezoidProfile.State(
+                inputs.angle.getRadians(),
+                0
+            ), 
+            new TrapezoidProfile.State(
             MathUtil.clamp(
                 targetAngle.get().getRadians(),
                 Units.degreesToRadians(LOWEST_ANGLE),
@@ -123,7 +127,7 @@ public class Arm extends SubsystemBase {
         //System.out.println(setpointState.position + " " + setpointState.velocity);
 
         //TODO: I should probably add in safety limits or smtn but whatever
-        io.setVoltage(feedback.calculate(inputs.angle.getRadians(), targetAngle.get().getRadians()) + feedforward.calculate(inputs.angle.getRadians(), 0));
+        io.setVoltage(feedback.calculate(inputs.angle.getRadians(), targetAngle.get().getRadians()) + feedforward.calculate(setpointState.position, setpointState.velocity));
 
         //visualization update
 

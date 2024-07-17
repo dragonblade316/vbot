@@ -110,7 +110,7 @@ public class Intake implements GenericRollers<Intake.IntakeGoal> {
         //<jam detection>
         currentBuffer.enQueue(inputs.currentAmps);
         double avg = 0;
-        for(int i = 0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {
             avg = avg + currentBuffer.get(i);
         }
         avg = avg / 10;

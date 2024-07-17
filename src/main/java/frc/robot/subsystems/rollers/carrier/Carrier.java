@@ -107,7 +107,7 @@ public class Carrier implements GenericRollers<Carrier.CarrierGoal> {
         //io.updateInputs(inputs);
         if (goal == CarrierGoal.Intake && inputs.isPiecePresent) {
             goal = CarrierGoal.Stop;
-            periodic();
+            io.setVelocity(0, 0);
         }
     }
 
