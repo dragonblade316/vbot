@@ -10,8 +10,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.ExtendedKalmanFilter;
-import edu.wpi.first.math.estimator.KalmanFilter;
-import edu.wpi.first.math.estimator.UnscentedKalmanFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -22,10 +20,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveWheelPositions;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -59,14 +54,14 @@ public class VSwervePoseEstimator {
     private double last_kalman_predect = Timer.getFPGATimestamp();
 
     //copied from citrus circuts (with a couple changes)
-    private ExtendedKalmanFilter kf = new ExtendedKalmanFilter<>(
+    private ExtendedKalmanFilter<N3, N3, N3> kf = new ExtendedKalmanFilter<>(
         Nat.N3(), 
         Nat.N3(), 
         Nat.N3(), 
         (x, u) -> u, 
         (x, u) -> x, 
-        null, 
-        null, 
+        VecBuilder.fill(8888,8888,8888), 
+        VecBuilder.fill(0.0001, 0.0001, 0.0001), 
         0.02);
 
 
@@ -109,6 +104,11 @@ public class VSwervePoseEstimator {
 
 
     public void updateOdometry(OdometryObservation observation) {
+        //the timestamp stuff is needed because the odom can be 250 hz or 50 depending on mode
+        kf.predict(VecBuilder.fill(0.0, 0.0, 0.0), last_kalman_predect - Timer.getFPGATimestamp());
+        // System.out.println(last_kalman_predect - Timer.getFPGATimestamp());
+        last_kalman_predect = Timer.getFPGATimestamp();
+
         //detect skidding
         double skiddingRatio = getSkiddingRatio(observation.states, kinematics);
         //System.out.println(skiddingRatio);
@@ -138,7 +138,8 @@ public class VSwervePoseEstimator {
         odometryPose = odometryPose.exp(twist);
      
         if (visionUpdates.isEmpty()) {
-            estimatedPose = odometryPose;
+            // estimatedPose = odometryPose;
+            kf.correct(VecBuilder.fill(0, 0, 0), VecBuilder.fill(odometryPose.getX(), odometryPose.getY(), odometryPose.getRotation().getRadians()));
         } else {
             var visionUpdate = visionUpdates.get(visionUpdates.lastKey());
             var newPose = visionUpdate.compensate(odometryPose);
@@ -147,18 +148,11 @@ public class VSwervePoseEstimator {
             kf.correct(VecBuilder.fill(0, 0, 0), VecBuilder.fill(newPose.getX(), newPose.getY(), newPose.getRotation().getRadians()));
         }
 
-        //the timestamp stuff is needed because the odom can be 250 hz or 50 depending on mode
-        kf.predict(VecBuilder.fill(0.0, 0.0, 0.0), Timer.getFPGATimestamp() - last_kalman_predect);
-        last_kalman_predect = Timer.getFPGATimestamp();
 
-        
+        estimatedPose = new Pose2d(kf.getXhat(0), kf.getXhat(1), Rotation2d.fromRadians(kf.getXhat(2)));
 
         // Calculate diff from last odometry pose and add onto pose estimate
         //estimatedPose = estimatedPose.exp(twist);
-
-         
-
-        
     }
 
     public Optional<Pose2d> sampleAt(double timestampSeconds) {
@@ -222,9 +216,12 @@ public class VSwervePoseEstimator {
 
         
         var visionUpdate = new VisionUpdate(new Pose2d(tempOPose.getX() + tempVPose.getX(), tempOPose.getY() + tempVPose.getY(), tempOPose.getRotation().plus(tempVPose.getRotation())).div(odometryFOM + visionFOM), odometryPose);
-        estimatedPose = visionUpdate.compensate(odometryPose);
+        var newpose = visionUpdate.compensate(odometryPose);
 
         visionUpdates.put(observation.timestamp, visionUpdate);
+
+        kf.correct(VecBuilder.fill(0,0,0), VecBuilder.fill(newpose.getX(), newpose.getY(), newpose.getRotation().getRadians()));
+        estimatedPose = new Pose2d(kf.getXhat(0), kf.getXhat(1), Rotation2d.fromRadians(kf.getXhat(2)));
 
         // Step 8: Remove later vision measurements. (Matches previous behavior)
         visionUpdates.tailMap(observation.timestamp, false).entrySet().clear();
