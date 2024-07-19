@@ -33,8 +33,6 @@ public class FlywheelIOSim implements FlywheelIO {
       sim.setInputVoltage(appliedVolts);
     }
 
-    System.out.println("ffvolts:" + ffVolts + " pid setpoint: " + pid.getSetpoint());
-
     sim.update(0.02);
 
     inputs.positionRotations = 0;

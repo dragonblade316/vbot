@@ -90,7 +90,7 @@ public class VSwervePoseEstimator {
     public void updateOdometry(OdometryObservation observation) {
         //detect skidding
         double skiddingRatio = getSkiddingRatio(observation.states, kinematics);
-        System.out.println(skiddingRatio);
+        //System.out.println(skiddingRatio);
 
         //TODO: tune this
         if (skiddingRatio > 2 ) odometryFOM += 0.2;

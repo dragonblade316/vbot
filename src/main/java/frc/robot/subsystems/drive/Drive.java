@@ -300,8 +300,6 @@ public class Drive extends SubsystemBase {
       optimizedSetpointStates[i] = modules[i].runSetpoint(setpointStates[i]);
     }
 
-    System.out.println("op " + VSwervePoseEstimator.getSkiddingRatio(optimizedSetpointStates, kinematics));
-
     // Log setpoint states
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
     Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);

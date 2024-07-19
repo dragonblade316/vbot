@@ -13,7 +13,6 @@ public class AutoController {
     }
 
     public ChassisSpeeds update() {
-        System.out.println("update");
         return speeds;
     }
 }

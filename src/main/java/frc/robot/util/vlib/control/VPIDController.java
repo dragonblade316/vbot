@@ -13,16 +13,19 @@ public class VPIDController extends PIDController {
     public VPIDController(String key, double kp, double ki, double kd) {
         super(kp, ki, kd);
 
-        this.kp = new TunableDouble(key, "kp", kp);
-        this.ki = new TunableDouble(key, "ki", ki);
-        this.kd = new TunableDouble(key, "kd", kd);
+        this.kp = new TunableDouble(key + "/kp", kp);
+        this.ki = new TunableDouble(key + "/ki", ki);
+        this.kd = new TunableDouble(key + "/kd", kd);
     }
 
     @Override
     public double calculate(double measurement) {
-        super.setP(kp.get());
-        super.setI(ki.get());
-        super.setD(kd.get());
+        // super.setP(kp.get());
+        // super.setI(ki.get());
+        // super.setD(kd.get());
+
+        TunableDouble.ifChanged(hashCode(), () -> super.setPID(kp.get(), ki.get(), kd.get()), kp, ki, kd);
+
         return super.calculate(measurement);
     }
 }

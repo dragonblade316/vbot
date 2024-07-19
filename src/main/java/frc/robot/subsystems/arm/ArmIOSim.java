@@ -35,6 +35,7 @@ public class ArmIOSim implements ArmIO {
 
     @Override
     public void setVoltage(double voltage) {
+        this.voltage = voltage;
         motor.setInputVoltage(voltage);
     }
 

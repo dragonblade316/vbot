@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotState;
 import frc.robot.subsystems.arm.armUtils.VArmFeedforward;
+import frc.robot.util.vlib.control.VPIDController;
 
 public class Arm extends SubsystemBase {
     private ArmIO io;
@@ -29,7 +30,7 @@ public class Arm extends SubsystemBase {
 
     private VArmFeedforward feedforward;
     //TODO: fix the VPID and use here
-    private PIDController feedback;
+    private VPIDController feedback;
 
     private Supplier<Rotation2d> targetAngle = () -> Rotation2d.fromDegrees(18);
     private TrapezoidProfile.State setPointState;
@@ -44,7 +45,7 @@ public class Arm extends SubsystemBase {
 
     Mechanism2d mech = new Mechanism2d(3, 3);
     MechanismRoot2d root = mech.getRoot("arm", 1, 0);
-    MechanismLigament2d actual = new MechanismLigament2d("armCurrent", 0.5, 0, 6, new Color8Bit(Color.kRed));
+    MechanismLigament2d actual = new MechanismLigament2d("armCurrent", 0.8, 0, 6, new Color8Bit(Color.kRed));
     MechanismLigament2d target = new MechanismLigament2d("armTarget", 0.5, 0, 6, new Color8Bit(Color.kBlue));
 
     //all of these are in degrees, they will be converted to rads
@@ -71,7 +72,7 @@ public class Arm extends SubsystemBase {
         switch (Constants.currentMode) {
             case REAL:
                 feedforward = new VArmFeedforward(0, 0.1, 0);
-                feedback = new PIDController(0, 0, 0);
+                feedback = new VPIDController("ArmPID", 0, 0, 0);
                 break;
             
             case REPLAY:
@@ -80,8 +81,8 @@ public class Arm extends SubsystemBase {
 
             default:
                 //these guessed values are good enough for now but may need more tuning in the future
-                feedforward = new VArmFeedforward(0.1, 0, 0);
-                feedback = new PIDController(0, 0, 0);
+                feedforward = new VArmFeedforward(1.0, 0, 0);
+                feedback = new VPIDController("ArmPID", 0, 0, 0);
                 // feedback = new PIDController(4, 0, 0);
                 break;
         }
@@ -114,6 +115,7 @@ public class Arm extends SubsystemBase {
             0.02, 
             new TrapezoidProfile.State(
                 inputs.angle.getRadians(),
+                //this needs to be zero. for some reason the arm slowly ocillates between its highest and lowest points if this is the actual value
                 0
             ), 
             new TrapezoidProfile.State(
@@ -124,10 +126,11 @@ public class Arm extends SubsystemBase {
             0.0));
 
 
-        //System.out.println(setpointState.position + " " + setpointState.velocity);
-
         //TODO: I should probably add in safety limits or smtn but whatever
         io.setVoltage(feedback.calculate(inputs.angle.getRadians(), targetAngle.get().getRadians()) + feedforward.calculate(setpointState.position, setpointState.velocity));
+
+        Logger.recordOutput("Arm/AtTarget", feedback.atSetpoint());
+        Logger.recordOutput("Arm/TargetAngle", targetAngle.get());
 
         //visualization update
 
