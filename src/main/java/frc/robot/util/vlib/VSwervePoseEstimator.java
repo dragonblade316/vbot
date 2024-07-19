@@ -8,7 +8,10 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.ExtendedKalmanFilter;
+import edu.wpi.first.math.estimator.KalmanFilter;
+import edu.wpi.first.math.estimator.UnscentedKalmanFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -19,7 +22,12 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveWheelPositions;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
+import edu.wpi.first.wpilibj.Timer;
 
 
 //Inspired by/copyed from orbit, mechanical advantage, and the wpilib PoseEstimator class
@@ -34,6 +42,7 @@ public class VSwervePoseEstimator {
     private Rotation2d previousAngle;
     private SwerveModulePosition[] previousPositions;
 
+    private double robotFOM = 0;
     private double odometryFOM = 0;
     private double visionFOM = 0;
 
@@ -46,6 +55,21 @@ public class VSwervePoseEstimator {
 
     private TimeInterpolatableBuffer<Pose2d> odometryPoseBuffer = TimeInterpolatableBuffer.createBuffer(2);
     private final NavigableMap<Double, VisionUpdate> visionUpdates = new TreeMap<>();
+
+    private double last_kalman_predect = Timer.getFPGATimestamp();
+
+    //copied from citrus circuts (with a couple changes)
+    private ExtendedKalmanFilter kf = new ExtendedKalmanFilter<>(
+        Nat.N3(), 
+        Nat.N3(), 
+        Nat.N3(), 
+        (x, u) -> u, 
+        (x, u) -> x, 
+        null, 
+        null, 
+        0.02);
+
+
 
 
     public static class OdometryObservation {
@@ -81,9 +105,6 @@ public class VSwervePoseEstimator {
         previousPositions = positions;
         estimatedPose = pose;
         odometryPose = pose;
-
-        //TODO: Figure out how the heck this works 
-        // kf = new ExtendedKalmanFilter<>(null, null, null, null, null, null, null, odometryFOM);
     }
 
 
@@ -120,11 +141,24 @@ public class VSwervePoseEstimator {
             estimatedPose = odometryPose;
         } else {
             var visionUpdate = visionUpdates.get(visionUpdates.lastKey());
-            estimatedPose = visionUpdate.compensate(odometryPose);
+            var newPose = visionUpdate.compensate(odometryPose);
+
+            
+            kf.correct(VecBuilder.fill(0, 0, 0), VecBuilder.fill(newPose.getX(), newPose.getY(), newPose.getRotation().getRadians()));
         }
+
+        //the timestamp stuff is needed because the odom can be 250 hz or 50 depending on mode
+        kf.predict(VecBuilder.fill(0.0, 0.0, 0.0), Timer.getFPGATimestamp() - last_kalman_predect);
+        last_kalman_predect = Timer.getFPGATimestamp();
+
+        
 
         // Calculate diff from last odometry pose and add onto pose estimate
         //estimatedPose = estimatedPose.exp(twist);
+
+         
+
+        
     }
 
     public Optional<Pose2d> sampleAt(double timestampSeconds) {

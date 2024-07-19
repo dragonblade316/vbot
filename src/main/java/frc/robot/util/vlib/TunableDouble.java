@@ -8,6 +8,7 @@ import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
+//TODO: add boundries in case certain numbers would be illigal
 
 //stolen from mech advantage
 public class TunableDouble implements DoubleSupplier {
