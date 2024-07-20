@@ -124,5 +124,9 @@ public class Intake implements GenericRollers<Intake.IntakeGoal> {
         
         Logger.recordOutput("Intake/SetPointRPM", goal.getRpmGoal());
     }
+
+    public boolean isJammed() {
+        return isjammed;
+    }
 }
 

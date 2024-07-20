@@ -80,6 +80,10 @@ public class Rollers extends SubsystemBase {
       goal = Goal.Stop;
     }
 
+    if (intake.isJammed()) {
+      goal = Goal.Barf;
+    }
+
     Logger.recordOutput("rollers/goal", goal);
 
     switch (goal) {
@@ -95,6 +99,15 @@ public class Rollers extends SubsystemBase {
         intake.setGoal(IntakeGoal.Stop);
         carrier.setGoal(CarrierGoal.Shoot);
         break;
+      case Barf:
+        //the robot can not barf unless its moving so this solves that issue
+        if (RobotState.get_instance().poseEstimator.getRobotReletiveVelocity().vyMetersPerSecond < -1) {
+          intake.setGoal(IntakeGoal.Barf);
+          carrier.setGoal(CarrierGoal.Barf);
+        } else {
+          intake.setGoal(IntakeGoal.Stop);
+          carrier.setGoal(CarrierGoal.Stop);
+        }
       default:
         intake.setGoal(IntakeGoal.Stop);
         carrier.setGoal(CarrierGoal.Stop);
