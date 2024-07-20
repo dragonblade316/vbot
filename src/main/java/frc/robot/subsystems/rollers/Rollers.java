@@ -101,13 +101,14 @@ public class Rollers extends SubsystemBase {
         break;
       case Barf:
         //the robot can not barf unless its moving so this solves that issue
-        if (RobotState.get_instance().poseEstimator.getRobotReletiveVelocity().vyMetersPerSecond < -1) {
+        if (RobotState.get_instance().poseEstimator.getRobotRelativeVelocity().vxMetersPerSecond < -1) {
           intake.setGoal(IntakeGoal.Barf);
           carrier.setGoal(CarrierGoal.Barf);
         } else {
           intake.setGoal(IntakeGoal.Stop);
           carrier.setGoal(CarrierGoal.Stop);
         }
+        break;
       default:
         intake.setGoal(IntakeGoal.Stop);
         carrier.setGoal(CarrierGoal.Stop);

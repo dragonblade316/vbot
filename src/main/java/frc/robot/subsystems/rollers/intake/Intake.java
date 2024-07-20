@@ -76,6 +76,7 @@ public class Intake implements GenericRollers<Intake.IntakeGoal> {
     // }
 
     public void setGoal(IntakeGoal goal) {
+        System.out.println(goal.toString());
         this.goal = goal;
     }
 
@@ -114,11 +115,13 @@ public class Intake implements GenericRollers<Intake.IntakeGoal> {
             avg = avg + currentBuffer.get(i);
         }
         avg = avg / 10;
-        if (avg < 60) {
+        if (avg > 60) {
             isjammed = true;
         }
         Logger.recordOutput("Intake/IsJammed", isjammed);
         //</jam detection>
+
+        Logger.recordOutput("Intake/Goal", goal);
 
         io.setVelocity(goal.getRpmGoal(), feedforward.calculate(goal.getRpmGoal()));
         
