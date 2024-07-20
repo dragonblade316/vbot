@@ -241,6 +241,7 @@ public class RobotContainer {
         () -> RobotState.get_instance().smartFireMode == RobotState.SmartFireMode.Standard));
 
     temp1.whileTrue(arm.setGoalCommand(Arm.SetGoal.SPEAKER_DEAD_REKON));
+    temp2.whileTrue(rollers.setGoalCommand(Rollers.Goal.Barf));
     
 
   }
@@ -275,6 +276,7 @@ public class RobotContainer {
     smartFireButton = new JoystickButton(rjoy, 3);
 
     temp1 = new JoystickButton(ljoy, 1);
+    temp2 = new JoystickButton(ljoy, 2);
   }
 
   private void simDriverBindings() {
