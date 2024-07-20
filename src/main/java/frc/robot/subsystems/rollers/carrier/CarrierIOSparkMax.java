@@ -1,6 +1,7 @@
 package frc.robot.subsystems.rollers.carrier;
 
 import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import java.util.InputMismatchException;
@@ -13,6 +14,7 @@ import com.revrobotics.SparkPIDController.ArbFFUnits;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import frc.robot.subsystems.rollers.SparkMaxDetectionThread;
 
 public class CarrierIOSparkMax implements CarrierIO {
     private static final double GEAR_RATIO = 5;
@@ -38,8 +40,11 @@ public class CarrierIOSparkMax implements CarrierIO {
 
         sensor = new DigitalInput(1);
         motor = new CANSparkMax(12, MotorType.kBrushless);
+        motor.setIdleMode(IdleMode.kBrake);
         encoder = motor.getEncoder();
         feedback = motor.getPIDController();
+
+        SparkMaxDetectionThread.getInstance().init(() -> sensor.get(), this::setVoltage);
     }
 
     public void updateInputs(CarrierIOInputs input) {
