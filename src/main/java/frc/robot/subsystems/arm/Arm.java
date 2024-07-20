@@ -128,6 +128,7 @@ public class Arm extends SubsystemBase {
 
         //TODO: I should probably add in safety limits or smtn but whatever
         io.setVoltage(feedback.calculate(inputs.angle.getRadians(), targetAngle.get().getRadians()) + feedforward.calculate(setpointState.position, setpointState.velocity));
+        RobotState.get_instance().armInPosition = feedback.atSetpoint();
 
         Logger.recordOutput("Arm/AtTarget", feedback.atSetpoint());
         Logger.recordOutput("Arm/TargetAngle", targetAngle.get());
