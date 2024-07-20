@@ -5,11 +5,12 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.util.vlib.FieldUtils;
 import frc.robot.util.vlib.VSwervePoseEstimator;
 
 public class RobotState {
@@ -39,13 +40,13 @@ public class RobotState {
     //TODO: replace these constants with actual math
     public static record AimingFunctions() {
         public static Supplier<Rotation2d> armAngle = () -> Rotation2d.fromDegrees(20);
-        public static Supplier<Rotation2d> heading = () -> Rotation2d.fromDegrees(0);
+        public static Supplier<Translation2d> heading = () -> FieldUtils.apply(new Translation2d(0.15, 5.5));
         public static DoubleSupplier flywheelSpeed = () -> 2500;
     }
 
     public static record LobbingFunctions() {
         public static Supplier<Rotation2d> armAngle = () -> Rotation2d.fromDegrees(20);
-        public static Supplier<Rotation2d> heading = () -> Rotation2d.fromDegrees(0);
+        public static Supplier<Translation2d> heading = () -> new Translation2d(0.15, 5.5);
         public static DoubleSupplier flywheelSpeed = () -> 0;
     }
 

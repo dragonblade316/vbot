@@ -52,7 +52,7 @@ public class AutoCommands {
     //heading mode must be set by the auto since this can be run to attempt shoot on the move
     public Command autoShoot(Drive drive, Flywheel flywheel, Rollers rollers, Arm arm) {
         var state = RobotState.get_instance();
-        return startShooter(flywheel, arm).andThen(new InstantCommand(() -> drive.setHeading(RobotState.AimingFunctions.heading))).andThen(Commands.run(() -> {
+        return startShooter(flywheel, arm).andThen(new InstantCommand(() -> drive.setHeadingWithTranslation(RobotState.AimingFunctions.heading))).andThen(Commands.run(() -> {
             if (state.armInPosition && state.headingAligned && state.shooterFlywheelState == FlywheelState.READY) {
                 rollers.setGoal(Goal.Shoot);;
             }

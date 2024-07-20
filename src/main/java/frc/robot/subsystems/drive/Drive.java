@@ -257,6 +257,12 @@ public class Drive extends SubsystemBase {
     PPHolonomicDriveController.setRotationTargetOverride(() -> Optional.of(heading.get()));
   }
 
+  public void setHeadingWithTranslation(Supplier<Translation2d> translation) {
+    Supplier<Rotation2d> angle = () -> Rotation2d.fromRadians(RobotState.get_instance().poseEstimator.getEstimatedPose().getTranslation().minus(translation.get()).getAngle().getRadians());
+    headingController = new HeadingController(angle);
+    PPHolonomicDriveController.setRotationTargetOverride(() -> Optional.of(angle.get()));
+  }
+
   public void clearHeading() {
     headingController = null;
     PPHolonomicDriveController.setRotationTargetOverride(() -> Optional.empty());
@@ -395,5 +401,9 @@ public class Drive extends SubsystemBase {
 
   public Command setHeadingCommand(Supplier<Rotation2d> heading) {
     return Commands.startEnd(() -> setHeading(heading), () -> clearHeading());
+  }
+
+  public Command setHeadingWithTranslationCommand(Supplier<Translation2d> translation) {
+    return Commands.startEnd(() -> setHeadingWithTranslation(translation), () -> clearHeading());
   }
 }

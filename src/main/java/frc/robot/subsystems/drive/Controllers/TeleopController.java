@@ -12,6 +12,7 @@ import edu.wpi.first.util.WPICleaner;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.RobotState;
 import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.util.vlib.FieldUtils;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 
@@ -57,9 +58,7 @@ public class TeleopController {
             linearVelocity.getX() * DriveConstants.MAX_LINEAR_SPEED,
             linearVelocity.getY() * DriveConstants.MAX_LINEAR_SPEED,
             omega * DriveConstants.MAX_ANGULAR_SPEED,
-            isFlipped
-                ? RobotState.get_instance().poseEstimator.getEstimatedPose().getRotation().plus(new Rotation2d(Math.PI))
-                : RobotState.get_instance().poseEstimator.getEstimatedPose().getRotation());
+            FieldUtils.apply(RobotState.get_instance().poseEstimator.getEstimatedPose().getRotation()));
 
         Logger.recordOutput("Drive/TeleopControllerOutput", speeds);
         return speeds;

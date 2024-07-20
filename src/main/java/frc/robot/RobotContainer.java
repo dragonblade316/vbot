@@ -231,7 +231,7 @@ public class RobotContainer {
     autoAmpButton.whileTrue(drive.setHeadingCommand(() -> FieldUtils.apply(Rotation2d.fromDegrees(90))).alongWith(arm.setGoalCommand(Arm.SetGoal.AMP)).alongWith(RobotState.get_instance().AmpTrapModeCommand()));
     smartFireButton.whileTrue(
       Commands.either(
-        drive.setHeadingCommand(RobotState.AimingFunctions.heading)
+        drive.setHeadingWithTranslationCommand(RobotState.AimingFunctions.heading)
         .alongWith(arm.setGoalCommand(RobotState.AimingFunctions.armAngle))
         .alongWith(flywheel.setVelocityCommand(() -> 2000))
         ,
