@@ -33,6 +33,8 @@ public class VSwervePoseEstimator {
     private Pose2d estimatedPose;
     private Pose2d odometryPose;
 
+    private ChassisSpeeds robotVelocity = new ChassisSpeeds();
+
     private Rotation2d gyroOffset;
     private Rotation2d previousAngle;
     private SwerveModulePosition[] previousPositions;
@@ -41,7 +43,6 @@ public class VSwervePoseEstimator {
     private double odometryFOM = 0;
     private double visionFOM = 0;
 
-    // private ExtendedKalmanFilter kf;
 
     private BuiltInAccelerometer accelerometer = new BuiltInAccelerometer();
     private double prevXAccel = 0.0;
@@ -60,7 +61,7 @@ public class VSwervePoseEstimator {
         Nat.N3(), 
         (x, u) -> u, 
         (x, u) -> x, 
-        VecBuilder.fill(8888,8888,8888), 
+        VecBuilder.fill(1, 1, 1), 
         VecBuilder.fill(0.0001, 0.0001, 0.0001), 
         0.02);
 
@@ -148,7 +149,7 @@ public class VSwervePoseEstimator {
             kf.correct(VecBuilder.fill(0, 0, 0), VecBuilder.fill(newPose.getX(), newPose.getY(), newPose.getRotation().getRadians()));
         }
 
-
+        robotVelocity = kinematics.toChassisSpeeds(observation.states);
         estimatedPose = new Pose2d(kf.getXhat(0), kf.getXhat(1), Rotation2d.fromRadians(kf.getXhat(2)));
 
         // Calculate diff from last odometry pose and add onto pose estimate
@@ -276,7 +277,6 @@ public class VSwervePoseEstimator {
         visionUpdates.headMap(newestNeededVisionUpdateTimestamp, false).clear();
     }
 
-
     public void setPose(Pose2d pose) {
         estimatedPose = pose;
     }
@@ -287,6 +287,10 @@ public class VSwervePoseEstimator {
 
     public Pose2d getEstimatedPose() {
         return estimatedPose;
+    }
+
+    public ChassisSpeeds getRobotReletiveVelocity() {
+        return robotVelocity;
     }
     
     // public Pose2d update(Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
