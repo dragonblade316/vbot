@@ -4,6 +4,7 @@ import java.util.NavigableMap;
 import java.util.Optional;
 import java.util.TreeMap;
 
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
@@ -289,7 +290,8 @@ public class VSwervePoseEstimator {
         return estimatedPose;
     }
 
-    public ChassisSpeeds getRobotReletiveVelocity() {
+    @AutoLogOutput
+    public ChassisSpeeds getRobotRelativeVelocity() {
         return robotVelocity;
     }
     
