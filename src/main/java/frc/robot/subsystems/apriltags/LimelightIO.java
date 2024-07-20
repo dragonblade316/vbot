@@ -22,7 +22,7 @@ public class LimelightIO implements ApriltagIO {
         inputs.robotPose = poseEstimate.pose;
         inputs.targetsDetected = poseEstimate.tagCount;
         
-        inputs.timestamp = poseEstimate.timestampSeconds;
+        inputs.visionTimestamp = poseEstimate.timestampSeconds;
         
         
 

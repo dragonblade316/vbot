@@ -18,7 +18,7 @@ public interface ApriltagIO {
         int targetsDetected = 0;
         Pose2d robotPose = new Pose2d();
         double distanceToClosestTargetMeters = 0;
-        double timestamp = 0;
+        double visionTimestamp = 0;
         
     }
 

@@ -35,7 +35,7 @@ public class PhotonIO implements ApriltagIO {
         inputs.targetsDetected = pose.get().targetsUsed.size();
         //TODO: set this
         inputs.distanceToClosestTargetMeters = 0;
-        inputs.timestamp = pose.get().timestampSeconds;
+        inputs.visionTimestamp = pose.get().timestampSeconds;
 
         //inputs.robotPose = ;
     }
