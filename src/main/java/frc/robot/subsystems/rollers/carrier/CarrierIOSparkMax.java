@@ -14,7 +14,7 @@ import com.revrobotics.SparkPIDController.ArbFFUnits;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PowerDistribution;
-import frc.robot.subsystems.rollers.SparkMaxDetectionThread;
+import frc.robot.subsystems.rollers.GamePieceDetectionThread;
 
 public class CarrierIOSparkMax implements CarrierIO {
     private static final double GEAR_RATIO = 5;
@@ -44,7 +44,7 @@ public class CarrierIOSparkMax implements CarrierIO {
         encoder = motor.getEncoder();
         feedback = motor.getPIDController();
 
-        SparkMaxDetectionThread.getInstance().init(() -> sensor.get(), this::setVoltage);
+        GamePieceDetectionThread.getInstance().init(() -> sensor.get(), this::setVoltage);
     }
 
     public void updateInputs(CarrierIOInputs input) {

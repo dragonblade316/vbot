@@ -20,7 +20,7 @@ public class Carrier implements GenericRollers<Carrier.CarrierGoal> {
     private CarrierGoal goal = CarrierGoal.Stop;
     public enum CarrierGoal implements GenericRollers.Goal {
         Intake(600),
-        Barf(-300),
+        Barf(-600),
         Shoot(1300),
         Stop(0)
         ;
@@ -59,7 +59,7 @@ public class Carrier implements GenericRollers<Carrier.CarrierGoal> {
         }
 
         //run 100 time per second
-        notifier.startPeriodic(0.01);
+        // notifier.startPeriodic(0.01);
 
         this.io = io;
     }

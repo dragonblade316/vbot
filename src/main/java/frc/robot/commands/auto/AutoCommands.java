@@ -28,8 +28,8 @@ import frc.robot.util.vlib.FieldUtils;
 public class AutoCommands {
 
     //This will need refactored once a custom odometry solution is made
-    public static void resetPose(Pose2d pose) {
-        RobotState.get_instance().poseEstimator.setPose(FieldUtils.apply(pose));
+    public static Command resetPose(Pose2d pose) {
+        return new InstantCommand(() -> RobotState.get_instance().poseEstimator.setPose(FieldUtils.apply(pose)));
     }
 
     //TODO: test if this works considering the heading is not gurenteed 
@@ -44,13 +44,17 @@ public class AutoCommands {
         return AutoBuilder.pathfindThenFollowPath(path, constraints, 0);
     }
 
-    public Command startShooter(Flywheel flywheel, Arm arm) {
+    public static Command startShooter(Flywheel flywheel, Arm arm) {
         return new InstantCommand(() -> flywheel.setVelocity(RobotState.AimingFunctions.flywheelSpeed), flywheel)
             .andThen(new InstantCommand(() -> arm.setGoal(RobotState.AimingFunctions.armAngle), arm));
     }
 
+    public static Command turnInPlace(Drive drive) {
+        return Commands.startEnd(() -> drive.setMode(DriveMode.Auto_Set_Heading), () -> drive.setMode(DriveMode.Auto), drive);
+    }
+
     //heading mode must be set by the auto since this can be run to attempt shoot on the move
-    public Command autoShoot(Drive drive, Flywheel flywheel, Rollers rollers, Arm arm) {
+    public static Command autoShoot(Drive drive, Flywheel flywheel, Rollers rollers, Arm arm) {
         var state = RobotState.get_instance();
         return startShooter(flywheel, arm).andThen(new InstantCommand(() -> drive.setHeadingWithTranslation(RobotState.AimingFunctions.heading))).andThen(Commands.run(() -> {
             if (state.armInPosition && state.headingAligned && state.shooterFlywheelState == FlywheelState.READY) {
@@ -61,8 +65,10 @@ public class AutoCommands {
 
     //TODO: this needs the note detector
     public static Command seek(Drive drive, GamePieceSeeker seeker) {
-        return null;
+        return Commands.none();
     }
+
+    
 
     
 }

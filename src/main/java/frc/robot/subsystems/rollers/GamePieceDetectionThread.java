@@ -5,20 +5,20 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.Notifier;
 
-public class SparkMaxDetectionThread {
-    private static SparkMaxDetectionThread INSTANCE;
+public class GamePieceDetectionThread {
+    private static GamePieceDetectionThread INSTANCE;
     Notifier notifier;
     Supplier<Boolean> isNotePresent;
     //this can be either a setVoltage or a setVelocity function. The goal is zero no matter what so just use what works best
     Consumer<Double> stopMotor;
 
-    private SparkMaxDetectionThread() {
+    private GamePieceDetectionThread() {
         notifier = new Notifier(() -> check());
     }
 
-    public static SparkMaxDetectionThread getInstance() {
+    public static GamePieceDetectionThread getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new SparkMaxDetectionThread();
+            INSTANCE = new GamePieceDetectionThread();
         }
         return INSTANCE;
     }

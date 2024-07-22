@@ -31,6 +31,8 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.auto.AutoCommands;
+import frc.robot.commands.auto.Autos;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmIO;
 import frc.robot.subsystems.arm.ArmIOSim;
@@ -101,9 +103,6 @@ public class RobotContainer {
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
   private final LoggedDashboardChooser<Driver> driverChooser;
-
-  private final LoggedDashboardNumber flywheelSpeedInput =
-      new LoggedDashboardNumber("Flywheel Speed", 1500.0);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -203,7 +202,7 @@ public class RobotContainer {
     autoChooser.addOption(
         "Rollers SysID", rollers.sysIdCommand());
 
-    //autoChooser.addOption("chortest", AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory("NewPath")));
+    autoChooser.addOption("chortest", Autos.NeutralGood(drive, arm, flywheel, rollers));
 
     // Configure the button bindings
     configureButtonBindings();
