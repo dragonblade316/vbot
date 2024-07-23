@@ -50,7 +50,7 @@ import frc.robot.subsystems.drive.Controllers.AutoController;
 import frc.robot.subsystems.drive.Controllers.HeadingController;
 import frc.robot.subsystems.drive.Controllers.TeleopController;
 import frc.robot.util.LocalADStarAK;
-import frc.robot.util.vlib.VSwervePoseEstimator;
+import frc.robot.util.vlib.swerve.VSwervePoseEstimator;
 
 public class Drive extends SubsystemBase {
   
