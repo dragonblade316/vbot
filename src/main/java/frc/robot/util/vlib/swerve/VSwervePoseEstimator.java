@@ -1,4 +1,4 @@
-package frc.robot.util.vlib;
+package frc.robot.util.vlib.swerve;
 
 import java.util.NavigableMap;
 import java.util.Optional;
@@ -91,6 +91,11 @@ public class VSwervePoseEstimator {
     public class VisionObservation {
         Pose2d pose;
         double timestamp;
+
+        public VisionObservation(Pose2d pose, double timestamp) {
+            this.pose = pose;
+            this.timestamp = timestamp;
+        }
     }
 
 

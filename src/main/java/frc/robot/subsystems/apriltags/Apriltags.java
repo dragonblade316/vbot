@@ -2,6 +2,8 @@ package frc.robot.subsystems.apriltags;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotState;
+import frc.robot.util.vlib.swerve.VSwervePoseEstimator;
+import frc.robot.util.vlib.swerve.VSwervePoseEstimator.VisionObservation;
 
 public class Apriltags extends SubsystemBase {
 
