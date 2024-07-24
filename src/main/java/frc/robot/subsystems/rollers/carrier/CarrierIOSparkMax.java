@@ -4,14 +4,13 @@ import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
-import java.util.InputMismatchException;
+import java.util.function.Supplier;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkPIDController.ArbFFUnits;
 
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import frc.robot.subsystems.rollers.GamePieceDetectionThread;
@@ -44,7 +43,7 @@ public class CarrierIOSparkMax implements CarrierIO {
         encoder = motor.getEncoder();
         feedback = motor.getPIDController();
 
-        GamePieceDetectionThread.getInstance().init(() -> sensor.get(), this::setVoltage);
+        
     }
 
     public void updateInputs(CarrierIOInputs input) {
@@ -53,6 +52,10 @@ public class CarrierIOSparkMax implements CarrierIO {
         input.velocityRPM = encoder.getVelocity() / GEAR_RATIO;
         input.positionRotations = encoder.getPosition() / GEAR_RATIO;
     }
+
+    // public void initThread(Supplier<Boolean> isIntaking) {
+    //     GamePieceDetectionThread.getInstance().init(() -> sensor.get(), this::setVoltage, isIntaking);
+    // }
 
     public void setVoltage(double voltage) {
         motor.setVoltage(voltage);

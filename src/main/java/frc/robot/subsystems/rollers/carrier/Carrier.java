@@ -19,9 +19,9 @@ public class Carrier implements GenericRollers<Carrier.CarrierGoal> {
     
     private CarrierGoal goal = CarrierGoal.Stop;
     public enum CarrierGoal implements GenericRollers.Goal {
-        Intake(600),
+        Intake(700),
         Barf(-600),
-        Shoot(1300),
+        Shoot(600),
         Stop(0)
         ;
         private double rpmGoal;
@@ -43,6 +43,7 @@ public class Carrier implements GenericRollers<Carrier.CarrierGoal> {
             case REAL:
                 feedforward = new SimpleMotorFeedforward(0.30474, 0.010524);
                 io.setPID(6.0404E-07, 0, 0);
+                
                 break;
             case REPLAY:
                 feedforward = new SimpleMotorFeedforward(0, 0);

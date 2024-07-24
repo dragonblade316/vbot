@@ -15,7 +15,6 @@ package frc.robot.subsystems.flywheel;
 
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
-import static edu.wpi.first.units.Units.VoltsPerMeterPerSecond;
 
 import java.util.function.DoubleSupplier;
 
@@ -23,15 +22,15 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants;
+import frc.robot.RobotState;
+import frc.robot.RobotState.FlywheelState;
 
 public class Flywheel extends SubsystemBase {
   private final FlywheelIO io;
@@ -51,8 +50,8 @@ public class Flywheel extends SubsystemBase {
     // separate robot with different tuning)
     switch (Constants.currentMode) {
       case REAL:
-        ffModel = new SimpleMotorFeedforward(0.0, 0.0);
-        io.configurePID(0.0001, 0.0, 0.0);
+        ffModel = new SimpleMotorFeedforward(0.26202, 0.0020314);
+        io.configurePID(2.3474E-06, 0.0, 0.0);
         break;
       case REPLAY:
         ffModel = new SimpleMotorFeedforward(0.1, 0.05);
@@ -83,7 +82,15 @@ public class Flywheel extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Flywheel", inputs);
-
+    
+    if (Math.abs(inputs.velocityRPM - velocityRPM.getAsDouble()) < 100 && velocityRPM.getAsDouble() != 0) {
+      RobotState.get_instance().shooterFlywheelState = FlywheelState.READY;
+    } else if (velocityRPM.getAsDouble() != 0) {
+      RobotState.get_instance().shooterFlywheelState = FlywheelState.ACCELERATING;
+    } else {
+      RobotState.get_instance().shooterFlywheelState = FlywheelState.INACTIVE;
+    }
+    Logger.recordOutput("Flywheel/state", RobotState.get_instance().shooterFlywheelState);
 
     // Log flywheel setpoin to one of the labelet
     Logger.recordOutput("Flywheel/SetpointRPM", velocityRPM.getAsDouble());

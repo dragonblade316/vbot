@@ -9,6 +9,7 @@ public class GamePieceDetectionThread {
     private static GamePieceDetectionThread INSTANCE;
     Notifier notifier;
     Supplier<Boolean> isNotePresent;
+    Supplier<Boolean> isIntaking;
     //this can be either a setVoltage or a setVelocity function. The goal is zero no matter what so just use what works best
     Consumer<Double> stopMotor;
 
@@ -23,10 +24,11 @@ public class GamePieceDetectionThread {
         return INSTANCE;
     }
 
-    public void init(Supplier<Boolean> isNotePresent, Consumer<Double> stopMotor) { 
+    public void init(Supplier<Boolean> isNotePresent, Consumer<Double> stopMotor, Supplier<Boolean> isIntaking) { 
         this.isNotePresent = isNotePresent;
         this.stopMotor = stopMotor;
-        notifier.startPeriodic(0.01);
+        this.isIntaking = isIntaking;
+        notifier.startPeriodic(0.005);
     }
 
     private void check() {

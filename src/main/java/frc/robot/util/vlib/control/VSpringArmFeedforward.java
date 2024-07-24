@@ -21,14 +21,15 @@ public class VSpringArmFeedforward extends VArmFeedforward {
         double positionRadians, double velocityRadPerSec, double accelRadPerSecSquared) {
 
         double g = Math.cos(positionRadians - Units.degreesToRadians(45));
+        //double g = Math.cos(positionRadians);
 
         if (positionRadians < Units.degreesToRadians(45)) {
             g = 0;
         }
 
-        return ks.get() * Math.signum(velocityRadPerSec)
-            + kg.get() * g
-            + kv.get() * velocityRadPerSec
-            + ka.get() * accelRadPerSecSquared;
+        return super.ks.get() * Math.signum(velocityRadPerSec)
+            + super.kg.get() * g
+            + super.kv.get() * velocityRadPerSec
+            + super.ka.get() * accelRadPerSecSquared;
     }
 }

@@ -14,11 +14,7 @@
 package frc.robot;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
-import com.pathplanner.lib.path.PathConstraints;
-
-import edu.wpi.first.math.estimator.ExtendedKalmanFilter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -26,35 +22,28 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.auto.AutoCommands;
+import frc.robot.RobotState.FlywheelState;
 import frc.robot.commands.auto.Autos;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmIO;
 import frc.robot.subsystems.arm.ArmIOSim;
-import frc.robot.subsystems.arm.ArmIOSparkMax;
-import frc.robot.subsystems.arm.Arm.SetGoal;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.Drive.DriveMode;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOSparkMax;
-import frc.robot.subsystems.drive.Drive.DriveMode;
 import frc.robot.subsystems.extender.Extender;
 import frc.robot.subsystems.extender.ExtenderIO;
 import frc.robot.subsystems.extender.ExtenderIOSim;
-import frc.robot.subsystems.extender.ExtenderIOSparkMax;
 import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.flywheel.FlywheelIO;
 import frc.robot.subsystems.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.flywheel.FlywheelIOSparkMax;
 import frc.robot.subsystems.rollers.Rollers;
-import frc.robot.subsystems.rollers.Rollers.Goal;
 import frc.robot.subsystems.rollers.carrier.Carrier;
 import frc.robot.subsystems.rollers.carrier.CarrierIO;
 import frc.robot.subsystems.rollers.carrier.CarrierIOSim;
@@ -121,7 +110,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         flywheel = new Flywheel(new FlywheelIOSparkMax());
-        arm = new Arm(new ArmIOSparkMax());
+        arm = new Arm(new ArmIOSim() {});
         extender = new Extender(new ExtenderIO() {});
         intake = new Intake(new IntakeIOSparkMax());
         carrier = new Carrier(new CarrierIOSparkMax());
@@ -239,7 +228,12 @@ public class RobotContainer {
         
         () -> RobotState.get_instance().smartFireMode == RobotState.SmartFireMode.Standard));
 
-    temp1.whileTrue(arm.setGoalCommand(Arm.SetGoal.SPEAKER_DEAD_REKON));
+    //temp1.whileTrue(arm.setGoalCommand(Arm.SetGoal.SPEAKER_DEAD_REKON));
+    //temp1.whileTrue(flywheel.setVelocityCommand(() -> 1000));
+
+    temp1.whileTrue(
+      new InstantCommand(() -> flywheel.setVelocity(() -> 2000)).until(() -> RobotState.get_instance().shooterFlywheelState == FlywheelState.READY).andThen(() -> rollers.setGoal(Rollers.Goal.Shoot))
+    );
     temp2.whileTrue(rollers.setGoalCommand(Rollers.Goal.Barf));
     
 

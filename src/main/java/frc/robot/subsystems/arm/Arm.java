@@ -23,12 +23,13 @@ import frc.robot.Constants;
 import frc.robot.RobotState;
 import frc.robot.subsystems.arm.armUtils.VArmFeedforward;
 import frc.robot.util.vlib.control.VPIDController;
+import frc.robot.util.vlib.control.VSpringArmFeedforward;
 
 public class Arm extends SubsystemBase {
     private ArmIO io;
     private ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
 
-    private VArmFeedforward feedforward;
+    private VSpringArmFeedforward feedforward;
     //TODO: fix the VPID and use here
     private VPIDController feedback;
 
@@ -71,7 +72,8 @@ public class Arm extends SubsystemBase {
 
         switch (Constants.currentMode) {
             case REAL:
-                feedforward = new VArmFeedforward(0, 0.1, 0);
+                feedforward = new VSpringArmFeedforward("ArmFeedForward", 
+                0.8, 3, 0);
                 feedback = new VPIDController("ArmPID", 0, 0, 0);
                 break;
             
@@ -81,7 +83,7 @@ public class Arm extends SubsystemBase {
 
             default:
                 //these guessed values are good enough for now but may need more tuning in the future
-                feedforward = new VArmFeedforward(1.0, 0, 0);
+                feedforward = new VSpringArmFeedforward("ArmFeedForward", 1.0, 0, 0);
                 feedback = new VPIDController("ArmPID", 0, 0, 0);
                 // feedback = new PIDController(4, 0, 0);
                 break;
