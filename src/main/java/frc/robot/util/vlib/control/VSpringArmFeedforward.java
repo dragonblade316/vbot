@@ -27,6 +27,10 @@ public class VSpringArmFeedforward extends VArmFeedforward {
             g = 0;
         }
 
+
+        //If I finish this (which is not gurenteed) then this math needs to be rewriten.
+        //basically the gravity component (kg) needs to return to normal and an antigravity component needs to be added to compensate for the springs
+        //the antigravity component will either be a modified gravity component where the grav is highest straght up. or I will do this https://discord.com/channels/176186766946992128/1255246812705587303/1255246812705587303
         return super.ks.get() * Math.signum(velocityRadPerSec)
             + super.kg.get() * g
             + super.kv.get() * velocityRadPerSec

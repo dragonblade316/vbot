@@ -117,6 +117,8 @@ public class Intake implements GenericRollers<Intake.IntakeGoal> {
         if (avg > 60) {
             isjammed = true;
         }
+        //TODO: to unjam the intake the rollers will need to back spin I figure around 50 rotations. perhaps a safety check should be added just in case the note is stuck throughly
+
         Logger.recordOutput("Intake/IsJammed", isjammed);
         //</jam detection>
 
