@@ -49,10 +49,6 @@ public class AutoCommands {
             .andThen(new InstantCommand(() -> arm.setGoal(RobotState.AimingFunctions.armAngle), arm));
     }
 
-    public static Command turnInPlace(Drive drive) {
-        return Commands.startEnd(() -> drive.setMode(DriveMode.Auto_Set_Heading), () -> drive.setMode(DriveMode.Auto), drive);
-    }
-
     //heading mode must be set by the auto since this can be run to attempt shoot on the move
     public static Command autoShoot(Drive drive, Flywheel flywheel, Rollers rollers, Arm arm) {
         var state = RobotState.get_instance();

@@ -65,7 +65,6 @@ public class Drive extends SubsystemBase {
   public enum DriveMode {
     Teleop,
     Auto,
-    Auto_Set_Heading
   }
 
   private DriveMode currentDriveMode = DriveMode.Auto;
@@ -230,14 +229,13 @@ public class Drive extends SubsystemBase {
         //I am now realizing that pathplanner will just call run runVelocity so these drive modes are just to make sure the (dang it I just realized I'm an idiot and may need to make an autoController). 
         //speeds = headingController.update(speeds, Rotation2d.fromRadians(gyroInputs.yawPosition.getRadians() + (speeds.omegaRadiansPerSecond / 50)));
         speeds = autoController.update();
-        
-        break;
-      case Auto_Set_Heading:
-        //this mode will be used when manual control is desirable. This should not be used with pathplanner since pathplanner has its own heading control 
-        autoController.update();
         if (headingController != null) {
           speeds = headingController.update(speeds);
         }
+        
+        break;
+      default:
+        System.out.println("how did you get here; no drive mode is set");
         break;
     }
     
@@ -254,7 +252,7 @@ public class Drive extends SubsystemBase {
 
   public void setHeading(Supplier<Rotation2d> heading) {
     headingController = new HeadingController(heading);
-    PPHolonomicDriveController.setRotationTargetOverride(() -> Optional.of(heading.get()));
+    // PPHolonomicDriveController.setRotationTargetOverride(() -> Optional.of(heading.get()));
   }
 
   public void setHeadingWithTranslation(Supplier<Translation2d> translation) {
@@ -273,7 +271,7 @@ public class Drive extends SubsystemBase {
   }
 
   /**
-   * Runs the drive at the desired velocity.:w
+   * Runs the drive at the desired velocity.
    
    *
    * @param speeds Speeds in meters/sec
