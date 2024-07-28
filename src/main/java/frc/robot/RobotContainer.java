@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.RobotState.FlywheelState;
 import frc.robot.commands.auto.Autos;
+import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmIO;
 import frc.robot.subsystems.arm.ArmIOSim;
@@ -71,6 +72,8 @@ public class RobotContainer {
   private final Rollers rollers;
   private final Intake intake;
   private final Carrier carrier;
+
+  private final Superstructure superstructure = new Superstructure();
 
 
 
