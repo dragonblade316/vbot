@@ -15,6 +15,9 @@
         }
       },
       "SmartDashboard": {
+        "Auto Choices": {
+          "open": true
+        },
         "Drive": {
           "HeadingController": {
             "open": true

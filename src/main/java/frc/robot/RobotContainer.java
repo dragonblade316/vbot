@@ -188,7 +188,7 @@ public class RobotContainer {
     autoChooser.addOption(
         "Rollers SysID", rollers.sysIdCommand());
 
-    autoChooser.addOption("chortest", Autos.NeutralGood(drive, arm, flywheel, rollers));
+    autoChooser.addOption("chortest", Autos.test(drive));
 
     // Configure the button bindings
     configureButtonBindings();
