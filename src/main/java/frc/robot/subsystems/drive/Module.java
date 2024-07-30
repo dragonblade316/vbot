@@ -50,9 +50,9 @@ public class Module {
     // separate robot with different tuning)
     switch (Constants.currentMode) {
       case REAL:
-        driveFeedforward = new VSimpleMotorFeedforward("SwerveModules/Module" + index + "drive_feedforward", 0.0, 0.0);
-        driveFeedback = new VPIDController("SwerveModules/Module" + index + "/drive_controller", 0.1, 0.85, 0.0);
-        turnFeedback = new VPIDController("SwerveModules/Module" + index + "/angle_controller", 0.005, 0.0, 0.0);
+        driveFeedforward = new VSimpleMotorFeedforward("SwerveModules/Module" + index + "/drive_feedforward", 0.0, 0.0);
+        driveFeedback = new VPIDController("SwerveModules/Module" + index + "/drive_controller", 0.0, 0.0, 0.0);
+        turnFeedback = new VPIDController("SwerveModules/Module" + index + "/angle_controller", 2, 0.0, 0.0);
         break;
       case REPLAY:
         driveFeedforward = new SimpleMotorFeedforward(0.1, 0.13);
@@ -179,7 +179,7 @@ public class Module {
     if (turnRelativeOffset == null) {
       return new Rotation2d();
     } else {
-      return inputs.turnPosition.plus(turnRelativeOffset);
+      return inputs.turnAbsolutePosition.plus(turnRelativeOffset);
     }
   }
 

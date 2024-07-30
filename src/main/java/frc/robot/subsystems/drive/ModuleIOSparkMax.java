@@ -53,8 +53,10 @@ public class ModuleIOSparkMax implements ModuleIO {
   // public static final double DRIVE_ENCODER_RPM_TO_METERS_PER_SECOND = DRIVE_ENCODER_ROT_TO_METER / 60; 
 
   // TODO: change this
-  private static final double DRIVE_GEAR_RATIO = (1 / 7.13);
-  private static final double TURN_GEAR_RATIO = 1;
+  private static final double DRIVE_GEAR_RATIO = 7.13;
+  //this value is for the relative encoder not the abs
+  private static final double TURN_GEAR_RATIO = 15.429;
+  //private static final double TURN_GEAR_RATIO = 1;
 
   private final CANSparkMax driveSparkMax;
   private final CANSparkMax turnSparkMax;
@@ -67,7 +69,7 @@ public class ModuleIOSparkMax implements ModuleIO {
   private final Queue<Double> driveVelocityQueue;
   private final Queue<Double> turnPositionQueue;
 
-  private final boolean isTurnMotorInverted = false;
+  private final boolean isTurnMotorInverted = true;
   private final Rotation2d absoluteEncoderOffset;
 
   public ModuleIOSparkMax(int index) {
@@ -146,7 +148,8 @@ public class ModuleIOSparkMax implements ModuleIO {
     driveEncoder.setMeasurementPeriod(10);
     driveEncoder.setAverageDepth(2);
 
-    turnRelativeEncoder.setPosition(0.0);
+    //TODO: fix this
+    turnRelativeEncoder.setPosition(turnAbsoluteEncoder.getAbsolutePosition().getValueAsDouble());
     turnRelativeEncoder.setMeasurementPeriod(10);
     turnRelativeEncoder.setAverageDepth(2);
 
@@ -210,11 +213,12 @@ public class ModuleIOSparkMax implements ModuleIO {
     inputs.driveCurrentAmps = new double[] {driveSparkMax.getOutputCurrent()};
 
     inputs.turnAbsolutePosition =
-        Rotation2d.fromRotations(
-                turnAbsoluteEncoder.getPosition().getValue())
+        Rotation2d.fromRotations(turnAbsoluteEncoder.getAbsolutePosition().getValue())
             .minus(absoluteEncoderOffset);
+    
+
     inputs.turnPosition =
-        Rotation2d.fromRotations(turnRelativeEncoder.getPosition());
+        Rotation2d.fromRotations(turnRelativeEncoder.getPosition() / TURN_GEAR_RATIO);
     inputs.turnVelocityRadPerSec =
         Units.rotationsPerMinuteToRadiansPerSecond(turnRelativeEncoder.getVelocity())
             / TURN_GEAR_RATIO;
