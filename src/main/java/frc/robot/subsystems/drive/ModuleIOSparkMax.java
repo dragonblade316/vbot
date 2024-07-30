@@ -162,7 +162,7 @@ public class ModuleIOSparkMax implements ModuleIO {
         SparkMaxOdometryThread.getInstance()
             .registerSignal(
                 () -> {
-                  System.out.println("getting pos");
+                  //System.out.println("getting pos");
                   double value = driveEncoder.getPosition();
                   if (driveSparkMax.getLastError() == REVLibError.kOk) {
                     return OptionalDouble.of(value);
@@ -174,7 +174,7 @@ public class ModuleIOSparkMax implements ModuleIO {
         SparkMaxOdometryThread.getInstance()
             .registerSignal(
               () -> {
-                System.out.println("getting vel");
+                //System.out.println("getting vel");
                 double value = driveEncoder.getVelocity();
                 if (driveSparkMax.getLastError() == REVLibError.kOk) {
                   return OptionalDouble.of(value);

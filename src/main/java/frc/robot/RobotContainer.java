@@ -36,6 +36,7 @@ import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
+import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.subsystems.extender.Extender;
 import frc.robot.subsystems.extender.ExtenderIO;
 import frc.robot.subsystems.extender.ExtenderIOSim;
@@ -101,14 +102,10 @@ public class RobotContainer {
         drive =
             new Drive(
                 new GyroIOPigeon2(false),
-                // new ModuleIOSparkMax(0),
-                // new ModuleIOSparkMax(1),
-                // new ModuleIOSparkMax(2),
-                // new ModuleIOSparkMax(3))
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {});
+                new ModuleIOSparkMax(0),
+                new ModuleIOSparkMax(1),
+                new ModuleIOSparkMax(2),
+                new ModuleIOSparkMax(3));
         flywheel = new Flywheel(new FlywheelIOSparkMax());
         arm = new Arm(new ArmIOSim() {});
         extender = new Extender(new ExtenderIO() {});
