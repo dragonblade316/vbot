@@ -25,6 +25,9 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.Timer;
 
+//good reference
+//https://team2168.org/javadoc/wpilib/src-html/edu/wpi/first/math/estimator/SwerveDrivePoseEstimator.html#line.47
+
 
 //Inspired by/copyed from orbit, mechanical advantage, and the wpilib PoseEstimator class
 public class VSwervePoseEstimator {
@@ -112,9 +115,9 @@ public class VSwervePoseEstimator {
 
     public void updateOdometry(OdometryObservation observation) {
         //the timestamp stuff is needed because the odom can be 250 hz or 50 depending on mode
-        kf.predict(VecBuilder.fill(0.0, 0.0, 0.0), last_kalman_predect - Timer.getFPGATimestamp());
+        // kf.predict(VecBuilder.fill(0.0, 0.0, 0.0), last_kalman_predect - Timer.getFPGATimestamp());
         // System.out.println(last_kalman_predect - Timer.getFPGATimestamp());
-        last_kalman_predect = Timer.getFPGATimestamp();
+        // last_kalman_predect = Timer.getFPGATimestamp();
 
         //detect skidding
         double skiddingRatio = getSkiddingRatio(observation.states, kinematics);
@@ -145,16 +148,22 @@ public class VSwervePoseEstimator {
         }
         // Add twist to odometry pose
         odometryPose = odometryPose.exp(twist);
-     
+   
+        var u = VecBuilder.fill(twist.dx, twist.dy, twist.dtheta);
+        kf.predict(u, last_kalman_predect - Timer.getFPGATimestamp());
+        
+        // System.out.println(last_kalman_predect - Timer.getFPGATimestamp());
+        last_kalman_predect = Timer.getFPGATimestamp();
+
         if (visionUpdates.isEmpty()) {
             // estimatedPose = odometryPose;
-            kf.correct(VecBuilder.fill(0, 0, 0), VecBuilder.fill(odometryPose.getX(), odometryPose.getY(), odometryPose.getRotation().getRadians()));
+            kf.correct(u, VecBuilder.fill(odometryPose.getX(), odometryPose.getY(), odometryPose.getRotation().getRadians()));
         } else {
             var visionUpdate = visionUpdates.get(visionUpdates.lastKey());
             var newPose = visionUpdate.compensate(odometryPose);
 
             
-            kf.correct(VecBuilder.fill(0, 0, 0), VecBuilder.fill(newPose.getX(), newPose.getY(), newPose.getRotation().getRadians()));
+            kf.correct(u, VecBuilder.fill(newPose.getX(), newPose.getY(), newPose.getRotation().getRadians()));
         }
 
         robotVelocity = kinematics.toChassisSpeeds(observation.states);
@@ -229,6 +238,7 @@ public class VSwervePoseEstimator {
 
         visionUpdates.put(observation.timestamp, visionUpdate);
 
+        //might just be better to just correct the kalman filter instead of bothering with the pose merging.
         kf.correct(VecBuilder.fill(0,0,0), VecBuilder.fill(newpose.getX(), newpose.getY(), newpose.getRotation().getRadians()));
         estimatedPose = new Pose2d(kf.getXhat(0), kf.getXhat(1), Rotation2d.fromRadians(kf.getXhat(2)));
 

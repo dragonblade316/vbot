@@ -7,7 +7,8 @@ package frc.robot.subsystems.leds;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.leds.LedBuilder.Animations;
+import frc.robot.util.vlib.LedBuilder;
+import frc.robot.util.vlib.LedBuilder.Animations;
 
 public class Leds extends SubsystemBase {
   private AddressableLED m_led;

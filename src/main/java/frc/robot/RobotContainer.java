@@ -74,7 +74,6 @@ public class RobotContainer {
   private final Carrier carrier;
 
 
-
   // Controller
   private final Joystick rjoy = new Joystick(0);
   private final Joystick ljoy = new Joystick(1);
