@@ -39,16 +39,14 @@ public class Carrier implements GenericRollers<Carrier.CarrierGoal> {
     private CarrierIOInputsAutoLogged inputs = new CarrierIOInputsAutoLogged();
 
     public Carrier(CarrierIO io) {
-        switch (Constants.currentMode) {
-            case REAL:
+        switch (Constants.getMode()) {
+            case REAL, REPLAY:
                 feedforward = new SimpleMotorFeedforward(0.30474, 0.010524);
                 io.setPID(6.0404E-07, 0, 0);
-                
                 break;
-            case REPLAY:
-                feedforward = new SimpleMotorFeedforward(0, 0);
-                
-                break;
+            // case REPLAY:
+            //     feedforward = new SimpleMotorFeedforward(0, 0);
+            //     break;
             case SIM:
                 feedforward = new SimpleMotorFeedforward(0.3, 0.01);
                 io.setPID(0.0001, 0, 0);

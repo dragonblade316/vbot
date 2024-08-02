@@ -48,15 +48,15 @@ public class Flywheel extends SubsystemBase {
 
     // Switch constants based on mode (the physics simulator is treated as a
     // separate robot with different tuning)
-    switch (Constants.currentMode) {
-      case REAL:
+    switch (Constants.getMode()) {
+      case REAL, REPLAY:
         ffModel = new SimpleMotorFeedforward(0.26202, 0.0020314);
         io.configurePID(2.3474E-06, 0.0, 0.0);
         break;
-      case REPLAY:
-        ffModel = new SimpleMotorFeedforward(0.1, 0.05);
-        io.configurePID(1.0, 0.0, 0.0);
-        break;
+      // case REPLAY:
+      //   ffModel = new SimpleMotorFeedforward(0.1, 0.05);
+      //   io.configurePID(1.0, 0.0, 0.0);
+      //   break;
       case SIM:
         ffModel = new SimpleMotorFeedforward(0.4, 0.0);
         io.configurePID(0.01, 0.0, 0.0);

@@ -46,16 +46,16 @@ public class Intake implements GenericRollers<Intake.IntakeGoal> {
     
 
     public Intake(IntakeIO io) {
-        switch (Constants.currentMode) {
-            case REAL:
+        switch (Constants.getMode()) {
+            case REAL, REPLAY:
                 feedforward = new SimpleMotorFeedforward(0.32269, 0.010463);
                 io.setPID(8.9256E-07, 0.00, 0);
                 
                 break;
-            case REPLAY:
-                feedforward = new SimpleMotorFeedforward(0, 0);
+            // case REPLAY:
+            //     feedforward = new SimpleMotorFeedforward(0, 0);
                 
-                break;
+            //     break;
             case SIM:
                 feedforward = new SimpleMotorFeedforward(0.3, 0.01001);
                 io.setPID(0.0001, 0, 0);

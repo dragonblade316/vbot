@@ -30,11 +30,11 @@ public class Extender extends SubsystemBase {
     public Extender(ExtenderIO io) {
         this.io = io;
 
-        switch (Constants.currentMode) {
-            case REAL:
+        switch (Constants.getMode()) {
+            case REAL, REPLAY:
                 break;
-            case REPLAY:
-                break;
+            //case REPLAY:
+            //    break;
             case SIM:
                 io.setPID(3.5, 0, 0);
                 break;

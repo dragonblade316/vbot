@@ -48,17 +48,17 @@ public class Module {
 
     // Switch constants based on mode (the physics simulator is treated as a
     // separate robot with different tuning)
-    switch (Constants.currentMode) {
-      case REAL:
+    switch (Constants.getMode()) {
+      case REAL, REPLAY:
         driveFeedforward = new VSimpleMotorFeedforward("SwerveModules/Module" + index + "/drive_feedforward", 0.0, 0.0);
         driveFeedback = new VPIDController("SwerveModules/Module" + index + "/drive_controller", 0.0, 0.0, 0.0);
         turnFeedback = new VPIDController("SwerveModules/Module" + index + "/angle_controller", 2, 0.0, 0.0);
         break;
-      case REPLAY:
-        driveFeedforward = new SimpleMotorFeedforward(0.1, 0.13);
-        driveFeedback = new PIDController(0.05, 0.0, 0.0);
-        turnFeedback = new PIDController(7.0, 0.0, 0.0);
-        break;
+      // case REPLAY:
+      //   driveFeedforward = new SimpleMotorFeedforward(0.1, 0.13);
+      //   driveFeedback = new PIDController(0.05, 0.0, 0.0);
+      //   turnFeedback = new PIDController(7.0, 0.0, 0.0);
+      //   break;
       case SIM:
         driveFeedforward = new SimpleMotorFeedforward(0.0, 0.13);
         driveFeedback = new PIDController(0.1, 0.0, 0.0);

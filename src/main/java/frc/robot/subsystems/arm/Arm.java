@@ -70,16 +70,16 @@ public class Arm extends SubsystemBase {
         root.append(actual);
         root.append(target);
 
-        switch (Constants.currentMode) {
-            case REAL:
+        switch (Constants.getMode()) {
+            case REAL, REPLAY:
                 feedforward = new VSpringArmFeedforward("ArmFeedForward", 
                 0.8, 3, 0);
                 feedback = new VPIDController("ArmPID", 0, 0, 0);
                 break;
             
-            case REPLAY:
+            // case REPLAY:
 
-                break;
+            //     break;
 
             default:
                 //these guessed values are good enough for now but may need more tuning in the future

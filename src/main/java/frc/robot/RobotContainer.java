@@ -95,23 +95,55 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    switch (Constants.currentMode) {
+    switch (Constants.getMode()) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOPigeon2(false),
-                new ModuleIOSparkMax(0),
-                new ModuleIOSparkMax(1),
-                new ModuleIOSparkMax(2),
-                new ModuleIOSparkMax(3));
-        flywheel = new Flywheel(new FlywheelIOSparkMax());
-        arm = new Arm(new ArmIOSim() {});
-        extender = new Extender(new ExtenderIO() {});
-        intake = new Intake(new IntakeIOSparkMax());
-        carrier = new Carrier(new CarrierIOSparkMax());
-        break;
+        switch (Constants.getRobot()) {
+          case BEBOP:
+            drive =
+                new Drive(
+                    new GyroIOPigeon2(false),
+                    new ModuleIOSparkMax(0),
+                    new ModuleIOSparkMax(1),
+                    new ModuleIOSparkMax(2),
+                    new ModuleIOSparkMax(3));
+            flywheel = new Flywheel(new FlywheelIOSparkMax());
+            arm = new Arm(new ArmIOSim() {});
+            extender = new Extender(new ExtenderIO() {});
+            intake = new Intake(new IntakeIOSparkMax());
+            carrier = new Carrier(new CarrierIOSparkMax());
+            break;
+          case BRUCE:
+            drive =
+                new Drive(
+                    new GyroIO() {}, //replace with navx
+                    new ModuleIOSparkMax(0),
+                    new ModuleIOSparkMax(1),
+                    new ModuleIOSparkMax(2),
+                    new ModuleIOSparkMax(3));
+            flywheel = new Flywheel(new FlywheelIO() {});
+            arm = new Arm(new ArmIO() {});
+            extender = new Extender(new ExtenderIO() {});
+            intake = new Intake(new IntakeIO() {});
+            carrier = new Carrier(new CarrierIO() {});
+            break;  
 
+          default:
+            drive =
+                new Drive(
+                    new GyroIO() {},
+                    new ModuleIO() {},
+                    new ModuleIO() {},
+                    new ModuleIO() {},
+                    new ModuleIO() {});
+            flywheel = new Flywheel(new FlywheelIO() {});
+            arm = new Arm(new ArmIO() {});
+            extender = new Extender(new ExtenderIO() {});
+            intake = new Intake(new IntakeIO() {});
+            carrier = new Carrier(new CarrierIO() {});
+            break;
+        }
+        break;
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
         drive =

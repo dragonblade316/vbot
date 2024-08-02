@@ -18,11 +18,11 @@ public class Climber extends SubsystemBase {
         //       such as SpeedControllers, Encoders, DigitalInputs, etc.
         this.io = io;
 
-        switch (Constants.currentMode) {
+        switch (Constants.getMode()) {
             case REAL:
                 break;
-            case REPLAY:
-                break;
+            // case REPLAY:
+            //     break;
             case SIM:
                 io.setPID(0, 0, 0);
                 break;
