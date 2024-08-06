@@ -8,8 +8,8 @@ public class TiltAccelLimiter {
     private TunableDouble YMaxAccel;
 
     public TiltAccelLimiter(String tableKey, double XMaxAccel, double YMaxAccel) {
-        this.XMaxAccel = new TunableDouble(tableKey + "XMaxAccel", XMaxAccel);
-        this.YMaxAccel = new TunableDouble(tableKey + "YMaxAccel", YMaxAccel);
+        this.XMaxAccel = new TunableDouble(tableKey + "/XMaxAccel", XMaxAccel);
+        this.YMaxAccel = new TunableDouble(tableKey + "/YMaxAccel", YMaxAccel);
     }
 
     public ChassisSpeeds update(ChassisSpeeds desiredAccel) {
