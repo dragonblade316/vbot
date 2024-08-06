@@ -179,7 +179,8 @@ public class Module {
     if (turnRelativeOffset == null) {
       return new Rotation2d();
     } else {
-      return inputs.turnAbsolutePosition.plus(turnRelativeOffset);
+      return inputs.turnAbsolutePosition;
+      // return inputs.turnPosition.plus(turnRelativeOffset);
     }
   }
 
