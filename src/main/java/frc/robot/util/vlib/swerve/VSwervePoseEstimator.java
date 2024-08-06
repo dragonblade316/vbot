@@ -150,27 +150,27 @@ public class VSwervePoseEstimator {
         odometryPose = odometryPose.exp(twist);
    
         var u = VecBuilder.fill(twist.dx, twist.dy, twist.dtheta);
-        kf.predict(u, last_kalman_predect - Timer.getFPGATimestamp());
+        // kf.predict(u, last_kalman_predect - Timer.getFPGATimestamp());
         
         // System.out.println(last_kalman_predect - Timer.getFPGATimestamp());
-        last_kalman_predect = Timer.getFPGATimestamp();
+        // last_kalman_predect = Timer.getFPGATimestamp();
 
         if (visionUpdates.isEmpty()) {
-            // estimatedPose = odometryPose;
-            kf.correct(u, VecBuilder.fill(odometryPose.getX(), odometryPose.getY(), odometryPose.getRotation().getRadians()));
+            estimatedPose = odometryPose;
+            // kf.correct(u, VecBuilder.fill(odometryPose.getX(), odometryPose.getY(), odometryPose.getRotation().getRadians()));
         } else {
             var visionUpdate = visionUpdates.get(visionUpdates.lastKey());
             var newPose = visionUpdate.compensate(odometryPose);
 
             
-            kf.correct(u, VecBuilder.fill(newPose.getX(), newPose.getY(), newPose.getRotation().getRadians()));
+            // kf.correct(u, VecBuilder.fill(newPose.getX(), newPose.getY(), newPose.getRotation().getRadians()));
         }
 
         robotVelocity = kinematics.toChassisSpeeds(observation.states);
-        estimatedPose = new Pose2d(kf.getXhat(0), kf.getXhat(1), Rotation2d.fromRadians(kf.getXhat(2)));
+        // estimatedPose = new Pose2d(kf.getXhat(0), kf.getXhat(1), Rotation2d.fromRadians(kf.getXhat(2)));
 
         // Calculate diff from last odometry pose and add onto pose estimate
-        //estimatedPose = estimatedPose.exp(twist);
+        estimatedPose = estimatedPose.exp(twist);
     }
 
     public Optional<Pose2d> sampleAt(double timestampSeconds) {
