@@ -87,7 +87,7 @@ public class ModuleIOSparkMax implements ModuleIO {
         config.MagnetSensor.MagnetOffset = 0.396728515625;
         turnAbsoluteEncoder.getConfigurator().apply(config);
 
-        driveSparkMax.setInverted(true);
+        driveSparkMax.setInverted(false);
 
         absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
         break;
@@ -95,6 +95,8 @@ public class ModuleIOSparkMax implements ModuleIO {
         turnSparkMax = new CANSparkMax(3, MotorType.kBrushless);
         driveSparkMax = new CANSparkMax(4, MotorType.kBrushless);
         turnAbsoluteEncoder = new CANcoder(2);
+
+        driveSparkMax.setInverted(true);
 
         config.MagnetSensor.MagnetOffset = -0.3564453125;
         turnAbsoluteEncoder.getConfigurator().apply(config);
@@ -109,7 +111,7 @@ public class ModuleIOSparkMax implements ModuleIO {
         config.MagnetSensor.MagnetOffset = -0.46142578125;
         turnAbsoluteEncoder.getConfigurator().apply(config);
 
-        driveSparkMax.setInverted(true);
+        driveSparkMax.setInverted(false);
 
         absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
         break;
@@ -117,6 +119,8 @@ public class ModuleIOSparkMax implements ModuleIO {
         turnSparkMax = new CANSparkMax(7, MotorType.kBrushless);
         driveSparkMax = new CANSparkMax(8, MotorType.kBrushless);
         turnAbsoluteEncoder = new CANcoder(4);
+
+        driveSparkMax.setInverted(true);
 
         config.MagnetSensor.MagnetOffset = 0.496826171875;
         turnAbsoluteEncoder.getConfigurator().apply(config);

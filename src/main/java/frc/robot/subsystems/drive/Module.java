@@ -50,7 +50,7 @@ public class Module {
     // separate robot with different tuning)
     switch (Constants.getMode()) {
       case REAL, REPLAY:
-        driveFeedforward = new VSimpleMotorFeedforward("SwerveModules/Module" + index + "/drive_feedforward", 0.0, 0.0);
+        driveFeedforward = new VSimpleMotorFeedforward("SwerveModules/Module" + index + "/drive_feedforward", 3, 0.0);
         driveFeedback = new VPIDController("SwerveModules/Module" + index + "/drive_controller", 0.0, 0.0, 0.0);
         turnFeedback = new VPIDController("SwerveModules/Module" + index + "/angle_controller", 2, 0.0, 0.0);
         break;
