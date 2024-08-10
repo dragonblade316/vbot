@@ -51,6 +51,9 @@ import frc.robot.subsystems.drive.Controllers.HeadingController;
 import frc.robot.subsystems.drive.Controllers.TeleopController;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.vlib.swerve.VSwervePoseEstimator;
+import frc.robot.util.vlib.swerve.acceleration.ForwardAccelLimiter;
+import frc.robot.util.vlib.swerve.acceleration.SkidAccelLimiter;
+import frc.robot.util.vlib.swerve.acceleration.TiltAccelLimiter;
 
 public class Drive extends SubsystemBase {
   
@@ -71,6 +74,10 @@ public class Drive extends SubsystemBase {
   private TeleopController teleopController = new TeleopController();
   private AutoController autoController = new AutoController();
   private HeadingController headingController = null;
+
+  private ForwardAccelLimiter forwardAccelLimiter = new ForwardAccelLimiter("ForwardAccelLimiter", 10, DriveConstants.MAX_LINEAR_SPEED, DriveConstants.DRIVE_BASE_RADIUS); 
+  private TiltAccelLimiter tiltAccelLimiter = new TiltAccelLimiter("TiltAccelLimiter", 10, 10);
+  private SkidAccelLimiter skidAccelLimiter = new SkidAccelLimiter("SkidAccelLimiter", 10, DriveConstants.DRIVE_BASE_RADIUS);
 
 
   private SwerveDriveKinematics kinematics = DriveConstants.kinematics;
@@ -239,9 +246,18 @@ public class Drive extends SubsystemBase {
         System.out.println("how did you get here; no drive mode is set");
         break;
     }
+
+    //acceleration limits
+    // ChassisSpeeds currentSpeeds = kinematics.toChassisSpeeds(getModuleStates());
+    // ChassisSpeeds accelSpeeds = speeds.minus(currentSpeeds);
+
+    // accelSpeeds = forwardAccelLimiter.update(kinematics.toChassisSpeeds(getModuleStates()), accelSpeeds);
+    // accelSpeeds = tiltAccelLimiter.update(accelSpeeds);
+    // accelSpeeds = skidAccelLimiter.update(accelSpeeds);
+
+    // speeds = currentSpeeds.plus(accelSpeeds);
     
     Logger.recordOutput("Drive/Speeds", speeds);
-    
 
     runVelocity(speeds);
   }
