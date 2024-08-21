@@ -48,7 +48,7 @@ public interface ModuleIO {
   public default void setDrivePID(double kp, double ki, double kd) {}
   public default void setTurnPID(double kp, double ki, double kd) {}
 
-  public default void setDriveSetpoint(double metersPerSecond, double ffVoltage) {}
+  public default void setDriveSetpoint(double radPerSecond, double ffVoltage) {}
   public default void setTurnSetpoint(Rotation2d setpoint) {}
 
 

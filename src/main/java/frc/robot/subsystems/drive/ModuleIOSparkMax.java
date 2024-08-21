@@ -277,9 +277,9 @@ public class ModuleIOSparkMax implements ModuleIO {
   }
 
   @Override
-  public void setDriveSetpoint(double velocityRPM, double ffVolts) {
+  public void setDriveSetpoint(double radPerSecond, double ffVolts) {
     drivePID.setReference(
-        velocityRPM * DRIVE_GEAR_RATIO,
+        radPerSecond * DRIVE_GEAR_RATIO,
         ControlType.kVelocity,
         0,
         ffVolts,

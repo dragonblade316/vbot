@@ -14,6 +14,7 @@
 package frc.robot.subsystems.drive;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Timer;
@@ -32,9 +33,20 @@ public class ModuleIOSim implements ModuleIO {
   private DCMotorSim driveSim = new DCMotorSim(DCMotor.getNEO(1), 6.75, 0.025);
   private DCMotorSim turnSim = new DCMotorSim(DCMotor.getNEO(1), 150.0 / 7.0, 0.004);
 
+  private double ffVolts = 0;
+  private PIDController driveController = new PIDController(0,0,0);
+  private PIDController turnController = new PIDController(0,0,0);
+
   private final Rotation2d turnAbsoluteInitPosition = new Rotation2d(Math.random() * 2.0 * Math.PI);
   private double driveAppliedVolts = 0.0;
   private double turnAppliedVolts = 0.0;
+
+  private boolean closedLoop = false;
+
+  public ModuleIOSim() {
+    //PID setup
+    turnController.enableContinuousInput(-Math.PI, Math.PI);
+  }
 
   @Override
   public void updateInputs(ModuleIOInputs inputs) {
@@ -57,17 +69,50 @@ public class ModuleIOSim implements ModuleIO {
     inputs.odometryDrivePositionsRad = new double[] {inputs.drivePositionRad};
     inputs.odometryDriveVelocitiesRadPerSecond = new double[] {inputs.driveVelocityRadPerSec};
     inputs.odometryTurnPositions = new Rotation2d[] {inputs.turnPosition};
+
+    
+
+    if (closedLoop) {
+      driveAppliedVolts = MathUtil.clamp(driveController.calculate(inputs.driveVelocityRadPerSec) + ffVolts, -12, 12);
+      turnAppliedVolts = MathUtil.clamp(turnController.calculate(inputs.turnPosition.getRadians()), -12, 12);
+
+      driveSim.setInputVoltage(driveAppliedVolts);
+      turnSim.setInputVoltage(turnAppliedVolts);
+    }
+    
   }
 
   @Override
   public void setDriveVoltage(double volts) {
     driveAppliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
     driveSim.setInputVoltage(driveAppliedVolts);
+    closedLoop = false;
   }
 
   @Override
   public void setTurnVoltage(double volts) {
     turnAppliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
     turnSim.setInputVoltage(turnAppliedVolts);
+    closedLoop = false;
+  }
+
+  @Override
+  public void setDrivePID(double kp, double ki, double kd) {
+    driveController.setPID(kp, ki, kd);
+  }
+
+  public void setTurnPID(double kp, double ki, double kd) {
+    turnController.setPID(kp, ki, kd);
+  }
+
+  public void setDriveSetpoint(double rpm, double ffVolts) {
+    driveController.setSetpoint(rpm);
+    this.ffVolts = ffVolts;
+    closedLoop = true;
+  }
+
+  public void setTurnSetpoint(Rotation2d setpoint) {
+    turnController.setSetpoint(setpoint.getRadians());
+    closedLoop = true;
   }
 }

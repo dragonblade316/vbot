@@ -12,17 +12,20 @@ public class ForwardAccelLimiter {
 
     public ForwardAccelLimiter(String tableKey, double maxAccel, double maxVelocityMeters, double robotRadius)  {
         this.maxAccel = new TunableDouble(tableKey + "/ForwardMaxAccel", maxAccel);
+        this.maxVelocityMeters = maxVelocityMeters;
+        this.robotRadius = robotRadius;
     }
 
 
     public ChassisSpeeds update(ChassisSpeeds CurrentVelocity, ChassisSpeeds desiredAccel) {
         double currentMaxAccel = maxAccel.get() * (1-(SwerveMath.calculateVel(CurrentVelocity, robotRadius)/maxVelocityMeters));
-        
-
+       
+        // System.out.println(currentMaxAccel);
+        System.out.println("before "+desiredAccel);
         if (currentMaxAccel < SwerveMath.calculateVel(desiredAccel, robotRadius)) {
-            desiredAccel.times(currentMaxAccel / SwerveMath.calculateVel(desiredAccel, robotRadius));
+            desiredAccel = desiredAccel.times(currentMaxAccel / SwerveMath.calculateVel(desiredAccel, robotRadius));
         }
-
+        System.out.println("after "+desiredAccel);
         return desiredAccel;
     }
 }

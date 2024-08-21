@@ -8,6 +8,9 @@
     }
   },
   "NetworkTables": {
+    "Transitory Values": {
+      "open": false
+    },
     "transitory": {
       "AdvantageKit": {
         "DashboardInputs": {

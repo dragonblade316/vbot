@@ -77,7 +77,7 @@ public class Drive extends SubsystemBase {
 
   private ForwardAccelLimiter forwardAccelLimiter = new ForwardAccelLimiter("ForwardAccelLimiter", 10, DriveConstants.MAX_LINEAR_SPEED, DriveConstants.DRIVE_BASE_RADIUS); 
   private TiltAccelLimiter tiltAccelLimiter = new TiltAccelLimiter("TiltAccelLimiter", 10, 10);
-  private SkidAccelLimiter skidAccelLimiter = new SkidAccelLimiter("SkidAccelLimiter", 10, DriveConstants.DRIVE_BASE_RADIUS);
+  private SkidAccelLimiter skidAccelLimiter = new SkidAccelLimiter("SkidAccelLimiter", 3, DriveConstants.DRIVE_BASE_RADIUS);
 
 
   private SwerveDriveKinematics kinematics = DriveConstants.kinematics;
@@ -243,21 +243,9 @@ public class Drive extends SubsystemBase {
         
         break;
       default:
-        System.out.println("how did you get here; no drive mode is set");
+        System.out.println("how did you get here?; no drive mode is set");
         break;
     }
-
-    //acceleration limits
-    // ChassisSpeeds currentSpeeds = kinematics.toChassisSpeeds(getModuleStates());
-    // ChassisSpeeds accelSpeeds = speeds.minus(currentSpeeds);
-
-    // accelSpeeds = forwardAccelLimiter.update(kinematics.toChassisSpeeds(getModuleStates()), accelSpeeds);
-    // accelSpeeds = tiltAccelLimiter.update(accelSpeeds);
-    // accelSpeeds = skidAccelLimiter.update(accelSpeeds);
-
-    // speeds = currentSpeeds.plus(accelSpeeds);
-    
-    Logger.recordOutput("Drive/Speeds", speeds);
 
     runVelocity(speeds);
   }
@@ -304,12 +292,19 @@ public class Drive extends SubsystemBase {
 
     //TODO: figure out the acceleration limits. 
     //accel limit (im stealing orbits accel limits for the time being)
-    ChassisSpeeds wantedAcc = speeds.minus(kinematics.toChassisSpeeds(getModuleStates()));
-    //wantedAcc = new ChassisSpeeds(DriveConstants.MAX_FORWARD_ACC, DriveConstants.MAX_FORWARD_ACC, DriveConstants.MAX_FORWARD_ACC / DriveConstants.DRIVE_BASE_RADIUS).times(1-kinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond- DriveConstants.MAX_LINEAR_SPEED);
-    
+    ChassisSpeeds currentSpeed = kinematics.toChassisSpeeds(getModuleStates());
+    ChassisSpeeds wantedAcc = discreteSpeeds.minus(currentSpeed);
+
+    Logger.recordOutput("Drive/Speeds/WantedVel", speeds);
+    Logger.recordOutput("Drive/Speeds/CurrentVel", currentSpeed);
+    Logger.recordOutput("Drive/Speeds/WantedAcc", wantedAcc);
+
+    wantedAcc = forwardAccelLimiter.update(currentSpeed, wantedAcc);
+    wantedAcc = tiltAccelLimiter.update(wantedAcc);
+    wantedAcc = skidAccelLimiter.update(wantedAcc); 
 
 
-    SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
+    SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(currentSpeed.plus(wantedAcc));
 
     //velocity limit
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, DriveConstants.MAX_LINEAR_SPEED);

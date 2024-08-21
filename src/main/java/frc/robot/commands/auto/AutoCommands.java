@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotState;
 import frc.robot.RobotState.FlywheelState;
 import frc.robot.subsystems.arm.Arm;
@@ -27,16 +28,19 @@ import frc.robot.util.vlib.FieldUtils;
 
 public class AutoCommands {
 
+    static Trigger trig = new Trigger(() -> true);
+
+
     //This will need refactored once a custom odometry solution is made
     public static Command resetPose(Pose2d pose) {
-        return new InstantCommand(() -> RobotState.get_instance().poseEstimator.setPose(FieldUtils.apply(pose)));
+        return new InstantCommand(() -> RobotState.get_instance().poseEstimator.setPose(FieldUtils.apply(pose))); 
     }
 
     //TODO: test if this works considering the heading is not gurenteed 
     public static Command repathToChoreo(String trajName, Drive drive) {
         //if I dont put this here I gurrentee I will forget (should this be a command)
         drive.setMode(DriveMode.Auto);
-
+        
         PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory(trajName);
         PathConstraints constraints = new PathConstraints(5.5, 3, 3, 1);
         
