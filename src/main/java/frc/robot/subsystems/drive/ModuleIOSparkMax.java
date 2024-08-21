@@ -21,12 +21,15 @@ import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
+import com.revrobotics.SparkPIDController.ArbFFUnits;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkPIDController;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -64,6 +67,8 @@ public class ModuleIOSparkMax implements ModuleIO {
   private final RelativeEncoder driveEncoder;
   private final RelativeEncoder turnRelativeEncoder;
   private final CANcoder turnAbsoluteEncoder;
+  private final SparkPIDController turnPID;
+  private final SparkPIDController drivePID;
   private final Queue<Double> timestampQueue;
   private final Queue<Double> drivePositionQueue;
   private final Queue<Double> driveVelocityQueue;
@@ -140,7 +145,15 @@ public class ModuleIOSparkMax implements ModuleIO {
     driveEncoder = driveSparkMax.getEncoder();
     turnRelativeEncoder = turnSparkMax.getEncoder();
 
+    drivePID = driveSparkMax.getPIDController();
+    turnPID = turnSparkMax.getPIDController();
 
+    drivePID.setFeedbackDevice(driveEncoder);
+    turnPID.setFeedbackDevice(turnRelativeEncoder);
+
+    turnPID.setPositionPIDWrappingEnabled(true);
+    turnPID.setPositionPIDWrappingMaxInput(0.5 * TURN_GEAR_RATIO);
+    turnPID.setPositionPIDWrappingMinInput(-0.5);
 
     turnSparkMax.setInverted(isTurnMotorInverted);
     driveSparkMax.setSmartCurrentLimit(40);
@@ -247,6 +260,38 @@ public class ModuleIOSparkMax implements ModuleIO {
     drivePositionQueue.clear();
     driveVelocityQueue.clear();
     turnPositionQueue.clear();
+  }
+
+  @Override
+  public void setDrivePID(double kp, double ki, double kd) {
+    drivePID.setP(kp);
+    drivePID.setI(ki);
+    drivePID.setD(kd);
+  }
+
+  @Override
+  public void setTurnPID(double kp, double ki, double kd) {
+    turnPID.setP(kp);
+    turnPID.setI(ki);
+    turnPID.setD(kd);
+  }
+
+  @Override
+  public void setDriveSetpoint(double velocityRPM, double ffVolts) {
+    drivePID.setReference(
+        velocityRPM * DRIVE_GEAR_RATIO,
+        ControlType.kVelocity,
+        0,
+        ffVolts,
+        ArbFFUnits.kVoltage);
+  }
+
+  @Override
+  public void setTurnSetpoint(Rotation2d setpoint) {
+    turnPID.setReference(
+      setpoint.getRotations() * DRIVE_GEAR_RATIO,
+      ControlType.kPosition
+    );
   }
 
   @Override

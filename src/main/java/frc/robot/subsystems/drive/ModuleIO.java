@@ -45,6 +45,13 @@ public interface ModuleIO {
   /** Run the turn motor at the specified voltage. */
   public default void setTurnVoltage(double volts) {}
 
+  public default void setDrivePID(double kp, double ki, double kd) {}
+  public default void setTurnPID(double kp, double ki, double kd) {}
+
+  public default void setDriveSetpoint(double metersPerSecond, double ffVoltage) {}
+  public default void setTurnSetpoint(Rotation2d setpoint) {}
+
+
   /** Enable or disable brake mode on the drive motor. */
   public default void setDriveBrakeMode(boolean enable) {}
 
